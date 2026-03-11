@@ -1,4 +1,4 @@
-  import React, { useState } from "react";
+  import React, { useState, useEffect } from "react";
 import {
   User,
   Lock,
@@ -65,26 +65,38 @@ const Settings = ({
   const [editingModelId, setEditingModelId] = useState(null);
   const [editModelData, setEditModelData] = useState({});
 
-  const [admins, setAdmins] = useState([
-    {
-      id: "2",
-      name: "Chaitanya",
-      email: "chaitanya@parivartan.crm",
-      role: "Manager",
-      status: "Active",
-      privileges: "Tech",
-      joinDate: "2024-02-10",
-    },
-    {
-      id: "3",
-      name: "Priya",
-      email: "priya@parivartan.crm",
-      role: "Admin",
-      status: "Active",
-      privileges: "Media",
-      joinDate: "2024-03-05",
-    },
-  ]);
+  const [admins, setAdmins] = useState([]);
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
+
+  // Fetch admin users when team tab is active
+  useEffect(() => {
+    if (activeTab === "team") {
+      fetchAdminUsers();
+    }
+  }, [activeTab]);
+
+  const fetchAdminUsers = async () => {
+    setLoadingAdmins(true);
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      const excludeUuid = loggedInUser?.uuid || loggedInUser?.id;
+      
+      const response = await fetch(
+        `${BASE_URL}/api/admin-users${excludeUuid ? `?excludeUuid=${excludeUuid}` : ""}`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdmins(data.users || []);
+      } else {
+        console.error("Failed to fetch admin users");
+      }
+    } catch (error) {
+      console.error("Error fetching admin users:", error);
+    } finally {
+      setLoadingAdmins(false);
+    }
+  };
 
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
   const [newAdmin, setNewAdmin] = useState({
@@ -192,20 +204,26 @@ const Settings = ({
   const [isPasswordSaved, setIsPasswordSaved] = useState(false);
 
   const [showToast, setShowToast] = useState(false);
+  const [showAdminToast, setShowAdminToast] = useState(false);
+  const [adminToastMessage, setAdminToastMessage] = useState("");
   const [selectedImageFile, setSelectedImageFile] = useState(null);
 
   const handleProfileSave = async () => {
     try {
       const formData = new FormData();
-      formData.append("full_name", profile.full_name);
-      formData.append("role", profile.role);
+      formData.append("full_name", profile.full_name || "");
+      formData.append("role", profile.role || "");
+      formData.append("email", profile.email || "");
+      formData.append("privileges", profile.privileges || "Both");
+      formData.append("status", profile.status !== undefined ? profile.status : 1);
       
       if (selectedImageFile) {
         formData.append("image", selectedImageFile);
       }
 
+      const userId = profile.uuid || profile.id;
       const response = await fetch(
-        `${BASE_URL}/api/admin-users/update/${profile.id}`,
+        `${BASE_URL}/api/admin-users/update/${userId}`,
         {
           method: "POST",
           body: formData,
@@ -255,26 +273,70 @@ const Settings = ({
     setTimeout(() => setIsAiSaved(false), 3000);
   };
 
-  const handleAddAdmin = () => {
+  const handleAddAdmin = async () => {
     if (newAdmin.name && newAdmin.email) {
-      const admin = {
-        id: String(admins.length + 1),
-        name: newAdmin.name,
-        email: newAdmin.email,
-        role: newAdmin.role,
-        status: newAdmin.status,
-        privileges: newAdmin.privileges,
-        joinDate: new Date().toISOString().split("T")[0],
-      };
-      setAdmins([...admins, admin]);
-      setNewAdmin({
-        name: "",
-        email: "",
-        role: "Admin",
-        status: "Active",
-        privileges: "Both",
-      });
-      setShowAddAdminForm(false);
+      try {
+        // Generate a default password (you might want to change this logic)
+        const defaultPassword = "Password@123"; // Or generate random
+        
+        const response = await fetch(`${BASE_URL}/api/admin-users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            full_name: newAdmin.name,
+            email: newAdmin.email,
+            password: defaultPassword,
+            role: newAdmin.role,
+            privileges: newAdmin.privileges,
+          }),
+        });
+
+        const contentType = response.headers.get("content-type");
+        let data;
+        
+        if (contentType && contentType.includes("application/json")) {
+          data = await response.json();
+        } else {
+          const text = await response.text();
+          console.error("Server returned non-JSON response:", text);
+          alert(`Server error: ${response.status}. Check console for details.`);
+          return;
+        }
+
+        if (response.ok) {
+          // Add the new admin to local state with returned UUID
+          const admin = {
+            id: data.uuid,
+            name: newAdmin.name,
+            email: newAdmin.email,
+            role: newAdmin.role,
+            status: newAdmin.status,
+            privileges: newAdmin.privileges,
+            joinDate: new Date().toISOString().split("T")[0],
+          };
+          setAdmins([...admins, admin]);
+          setNewAdmin({
+            name: "",
+            email: "",
+            role: "Admin",
+            status: "Active",
+            privileges: "Both",
+          });
+          setShowAddAdminForm(false);
+          setAdminToastMessage(`Admin created successfully! Default password: ${defaultPassword}`);
+          setShowAdminToast(true);
+          setTimeout(() => setShowAdminToast(false), 5000);
+          // Refresh the admin list
+          fetchAdminUsers();
+        } else {
+          alert(data.message || "Failed to create admin");
+        }
+      } catch (error) {
+        console.error("Add admin error:", error);
+        alert("Server error while creating admin. Check console for details.");
+      }
     }
   };
 
@@ -429,13 +491,18 @@ const Settings = ({
                   <div className="relative group shrink-0">
                     <label
                       htmlFor="profile-photo-upload"
-                      className={`block ${isProfileEditing ? "cursor-pointer" : "cursor-default"}`}
+                      className={`block relative ${isProfileEditing ? "cursor-pointer" : "cursor-default"}`}
                     >
                       {profile.image ? (
                         <img
+                          key={profile.image}
                           src={profile.image}
                           alt="Profile"
                           className="w-24 h-24 rounded-2xl border-4 border-slate-100 object-cover shadow-md group-hover:shadow-lg transition-shadow"
+                          onError={(e) => {
+                            console.error('Image failed to load:', profile.image);
+                            e.target.style.display = 'none';
+                          }}
                         />
                       ) : (
                         <div className="w-24 h-24 rounded-2xl border-4 border-slate-100 bg-primary flex items-center justify-center shadow-md">
@@ -476,12 +543,10 @@ const Settings = ({
                     <h3 className="text-2xl font-bold text-primary mb-1 tracking-tight">
                       {profile.full_name}
                     </h3>
-                    <p className="text-sm text-slate-500 font-bold mb-3">
+                    
+                    <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[10px]  font-bold tracking-widest">
                       {profile.role}
-                    </p>
-                    {/* <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[10px]  font-bold tracking-widest">
-                      Administrator
-                    </span> */}
+                    </span>
                   </div>
                 </div>
 
@@ -1222,8 +1287,19 @@ const Settings = ({
                   <h4 className="text-[10px] font-bold text-primary  tracking-[0.2em] ml-1">
                     Current Administrators ({admins.length})
                   </h4>
-                  <div className="grid grid-cols-1 gap-4">
-                    {admins.map((admin) => (
+                  
+                  {loadingAdmins ? (
+                    <div className="flex items-center justify-center py-10">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : admins.length === 0 ? (
+                    <div className="text-center py-10 text-slate-400">
+                      <Users size={48} className="mx-auto mb-3 opacity-50" />
+                      <p className="text-sm font-medium">No other administrators found</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                      {admins.map((admin) => (
                       <div
                         key={admin.id}
                         className={`p-6 bg-white border border-slate-200/60 rounded-[20px] hover:border-secondary/30 hover:shadow-md transition-all ${
@@ -1328,8 +1404,23 @@ const Settings = ({
                           ) : (
                             <>
                               <div className="flex items-center gap-4 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                  <User size={18} className="text-primary" />
+                                {admin.image ? (
+                                  <img
+                                    src={admin.image}
+                                    alt={admin.name}
+                                    className="w-10 h-10 rounded-xl object-cover border border-slate-200"
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                      e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                  />
+                                ) : null}
+                                <div 
+                                  className={`w-10 h-10 rounded-xl bg-primary flex items-center justify-center ${admin.image ? 'hidden' : 'flex'}`}
+                                >
+                                  <span className="text-sm font-bold text-white">
+                                    {admin.name?.charAt(0).toUpperCase() || "U"}
+                                  </span>
                                 </div>
                                 <div>
                                   <h5 className="font-bold text-slate-900 tracking-tight">
@@ -1355,7 +1446,7 @@ const Settings = ({
                           )}
                         </div>
                         <div className="flex gap-2">
-                          {editingAdminId !== admin.id && (
+                          {editingAdminId !== admin.id && admin.role !== "Root Admin" && (
                             <>
                               <button
                                 onClick={() => handleStartEditAdmin(admin)}
@@ -1365,21 +1456,35 @@ const Settings = ({
                               >
                                 <Edit2 size={16} />
                               </button>
-                              {admin.id !== "1" && (
-                                <button
-                                  onClick={() => handleDeleteAdmin(admin.id)}
-                                  className="p-2 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleDeleteAdmin(admin.id)}
+                                className="p-2 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500"
+                                title="Delete admin"
+                              >
+                                <Trash2 size={16} />
+                              </button>
                             </>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
+
+                {/* Admin Creation Toast Notification */}
+                {showAdminToast && (
+                  <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+                    <div className="flex items-center gap-3 px-5 py-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/30 border border-white/10 min-w-[320px]">
+                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <Check size={14} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-bold tracking-wide text-center">{adminToastMessage}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
