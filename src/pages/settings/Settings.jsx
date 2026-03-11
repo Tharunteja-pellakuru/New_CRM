@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User,
   Lock,
@@ -80,11 +80,11 @@ const Settings = ({
     try {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       const excludeUuid = loggedInUser?.uuid || loggedInUser?.id;
-      
+
       const response = await fetch(
-        `${BASE_URL}/api/admin-users${excludeUuid ? `?excludeUuid=${excludeUuid}` : ""}`
+        `${BASE_URL}/api/admin-users${excludeUuid ? `?excludeUuid=${excludeUuid}` : ""}`,
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         setAdmins(data.users || []);
@@ -255,8 +255,11 @@ const Settings = ({
       formData.append("role", profile.role || "");
       formData.append("email", profile.email || "");
       formData.append("privileges", profile.privileges || "Both");
-      formData.append("status", profile.status !== undefined ? profile.status : 1);
-      
+      formData.append(
+        "status",
+        profile.status !== undefined ? profile.status : 1,
+      );
+
       if (selectedImageFile) {
         formData.append("image", selectedImageFile);
       }
@@ -272,13 +275,16 @@ const Settings = ({
 
       const contentType = response.headers.get("content-type");
       let data;
-      
+
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       } else {
         const text = await response.text();
         console.error("Server returned non-JSON response:", text);
-        showToastMessage(`Server error: ${response.status}. Check console for details.`, "error");
+        showToastMessage(
+          `Server error: ${response.status}. Check console for details.`,
+          "error",
+        );
         return;
       }
 
@@ -304,7 +310,10 @@ const Settings = ({
       }
     } catch (error) {
       console.error("Profile save error:", error);
-      showToastMessage("Server error while updating profile. Check console for details.", "error");
+      showToastMessage(
+        "Server error while updating profile. Check console for details.",
+        "error",
+      );
     }
   };
   const handleAiSettingsSave = () => {
@@ -318,7 +327,7 @@ const Settings = ({
       try {
         // Generate a default password (you might want to change this logic)
         const defaultPassword = "Password@123"; // Or generate random
-        
+
         const response = await fetch(`${BASE_URL}/api/admin-users`, {
           method: "POST",
           headers: {
@@ -335,13 +344,16 @@ const Settings = ({
 
         const contentType = response.headers.get("content-type");
         let data;
-        
+
         if (contentType && contentType.includes("application/json")) {
           data = await response.json();
         } else {
           const text = await response.text();
           console.error("Server returned non-JSON response:", text);
-          showToastMessage(`Server error: ${response.status}. Check console for details.`, "error");
+          showToastMessage(
+            `Server error: ${response.status}. Check console for details.`,
+            "error",
+          );
           return;
         }
 
@@ -365,7 +377,9 @@ const Settings = ({
             privileges: "Both",
           });
           setShowAddAdminForm(false);
-          setAdminToastMessage(`Admin created successfully! Default password: ${defaultPassword}`);
+          setAdminToastMessage(
+            `Admin created successfully! Default password: ${defaultPassword}`,
+          );
           setShowAdminToast(true);
           setTimeout(() => setShowAdminToast(false), 5000);
           // Refresh the admin list
@@ -375,7 +389,10 @@ const Settings = ({
         }
       } catch (error) {
         console.error("Add admin error:", error);
-        showToastMessage("Server error while creating admin. Check console for details.", "error");
+        showToastMessage(
+          "Server error while creating admin. Check console for details.",
+          "error",
+        );
       }
     }
   };
@@ -387,15 +404,12 @@ const Settings = ({
       async () => {
         hideConfirmModal();
         try {
-          const response = await fetch(
-            `${BASE_URL}/api/admin-users/${id}`,
-            {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const response = await fetch(`${BASE_URL}/api/admin-users/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
           const contentType = response.headers.get("content-type");
           let data;
@@ -405,7 +419,10 @@ const Settings = ({
           } else {
             const text = await response.text();
             console.error("Server returned non-JSON response:", text);
-            showToastMessage(`Server error: ${response.status}. Check console for details.`, "error");
+            showToastMessage(
+              `Server error: ${response.status}. Check console for details.`,
+              "error",
+            );
             return;
           }
 
@@ -418,9 +435,12 @@ const Settings = ({
           }
         } catch (error) {
           console.error("Delete user error:", error);
-          showToastMessage("Server error while deleting user. Check console for details.", "error");
+          showToastMessage(
+            "Server error while deleting user. Check console for details.",
+            "error",
+          );
         }
-      }
+      },
     );
   };
 
@@ -450,22 +470,19 @@ const Settings = ({
     if (!editAdminData.name || !editAdminData.email) return;
 
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/admin-users/update/${id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            full_name: editAdminData.name,
-            email: editAdminData.email,
-            role: editAdminData.role,
-            status: editAdminData.status === "Active" ? 1 : 0,
-            privileges: editAdminData.privileges,
-          }),
+      const response = await fetch(`${BASE_URL}/api/admin-users/update/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          full_name: editAdminData.name,
+          email: editAdminData.email,
+          role: editAdminData.role,
+          status: editAdminData.status === "Active" ? 1 : 0,
+          privileges: editAdminData.privileges,
+        }),
+      });
 
       const data = await response.json();
 
@@ -500,7 +517,9 @@ const Settings = ({
     const minLength = password.length >= 8;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+      password,
+    );
 
     const errors = [];
     if (!minLength) errors.push("at least 8 characters");
@@ -529,7 +548,7 @@ const Settings = ({
       if (!validation.isValid) {
         showToastMessage(
           `Password must contain ${validation.errors.join(", ")}`,
-          "error"
+          "error",
         );
         return;
       }
@@ -547,7 +566,7 @@ const Settings = ({
               currentPassword: passwordData.currentPassword,
               newPassword: passwordData.newPassword,
             }),
-          }
+          },
         );
 
         const contentType = response.headers.get("content-type");
@@ -558,7 +577,10 @@ const Settings = ({
         } else {
           const text = await response.text();
           console.error("Server returned non-JSON response:", text);
-          showToastMessage(`Server error: ${response.status}. Check console for details.`, "error");
+          showToastMessage(
+            `Server error: ${response.status}. Check console for details.`,
+            "error",
+          );
           return;
         }
 
@@ -571,11 +593,17 @@ const Settings = ({
             confirmPassword: "",
           });
         } else {
-          showToastMessage(data.message || "Failed to update password", "error");
+          showToastMessage(
+            data.message || "Failed to update password",
+            "error",
+          );
         }
       } catch (error) {
         console.error("Update password error:", error);
-        showToastMessage("Server error while updating password. Check console for details.", "error");
+        showToastMessage(
+          "Server error while updating password. Check console for details.",
+          "error",
+        );
       }
     }
   };
@@ -639,8 +667,11 @@ const Settings = ({
                           alt="Profile"
                           className="w-24 h-24 rounded-2xl border-4 border-slate-100 object-cover shadow-md group-hover:shadow-lg transition-shadow"
                           onError={(e) => {
-                            console.error('Image failed to load:', profile.image);
-                            e.target.style.display = 'none';
+                            console.error(
+                              "Image failed to load:",
+                              profile.image,
+                            );
+                            e.target.style.display = "none";
                           }}
                         />
                       ) : (
@@ -789,7 +820,9 @@ const Settings = ({
                         <Check size={14} className="text-white" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold tracking-wide">Saved Successfully</p>
+                        <p className="text-xs font-bold tracking-wide">
+                          Saved Successfully
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -951,9 +984,16 @@ const Settings = ({
                   <div className="space-y-3">
                     {aiModels.length === 0 && (
                       <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                        <Bot size={48} className="mx-auto text-slate-300 mb-4" />
-                        <p className="text-slate-500 font-bold text-sm">No AI models configured</p>
-                        <p className="text-slate-400 text-xs mt-1">Add a new AI model to get started</p>
+                        <Bot
+                          size={48}
+                          className="mx-auto text-slate-300 mb-4"
+                        />
+                        <p className="text-slate-500 font-bold text-sm">
+                          No AI models configured
+                        </p>
+                        <p className="text-slate-400 text-xs mt-1">
+                          Add a new AI model to get started
+                        </p>
                       </div>
                     )}
                     {aiModels.map((model) => {
@@ -1417,7 +1457,7 @@ const Settings = ({
                   <h4 className="text-[10px] font-bold text-primary  tracking-[0.2em] ml-1">
                     Current Users ({admins.length})
                   </h4>
-                  
+
                   {loadingAdmins ? (
                     <div className="flex items-center justify-center py-10">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -1425,180 +1465,187 @@ const Settings = ({
                   ) : admins.length === 0 ? (
                     <div className="text-center py-10 text-slate-400">
                       <Users size={48} className="mx-auto mb-3 opacity-50" />
-                      <p className="text-sm font-medium">No other administrators found</p>
+                      <p className="text-sm font-medium">
+                        No other administrators found
+                      </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {admins.map((admin) => (
-                      <div
-                        key={admin.id}
-                        className={`p-6 bg-white border border-slate-200/60 rounded-[20px] hover:border-secondary/30 hover:shadow-md transition-all ${
-                          editingAdminId === admin.id
-                            ? "space-y-5"
-                            : "flex items-center justify-between"
-                        }`}
-                      >
-                        <div className="flex-1">
-                          {editingAdminId === admin.id ? (
-                            <div className="space-y-5">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div className="space-y-2">
-                                  <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
-                                    Full Name
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={editAdminData.name}
-                                    onChange={(e) =>
+                        <div
+                          key={admin.id}
+                          className={`p-6 bg-white border border-slate-200/60 rounded-[20px] hover:border-secondary/30 hover:shadow-md transition-all ${
+                            editingAdminId === admin.id
+                              ? "space-y-5"
+                              : "flex items-center justify-between"
+                          }`}
+                        >
+                          <div className="flex-1">
+                            {editingAdminId === admin.id ? (
+                              <div className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                  <div className="space-y-2">
+                                    <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                      Full Name
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={editAdminData.name}
+                                      onChange={(e) =>
+                                        setEditAdminData({
+                                          ...editAdminData,
+                                          name: e.target.value,
+                                        })
+                                      }
+                                      className="w-full h-[46px] px-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary/30 focus:border-secondary focus:outline-none transition-all text-sm font-bold shadow-sm"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                      Email
+                                    </label>
+                                    <input
+                                      type="email"
+                                      value={editAdminData.email}
+                                      onChange={(e) =>
+                                        setEditAdminData({
+                                          ...editAdminData,
+                                          email: e.target.value,
+                                        })
+                                      }
+                                      className="w-full h-[46px] px-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary/30 focus:border-secondary focus:outline-none transition-all text-sm font-bold shadow-sm"
+                                    />
+                                  </div>
+                                  <CustomDropdown
+                                    label="Role"
+                                    value={editAdminData.role}
+                                    field={`edit_admin_role_${admin.id}`}
+                                    options={[
+                                      "Root Admin",
+                                      "Admin",
+                                      "Manager",
+                                      "Moderator",
+                                    ]}
+                                    onChange={(val) =>
                                       setEditAdminData({
                                         ...editAdminData,
-                                        name: e.target.value,
+                                        role: val,
                                       })
                                     }
-                                    className="w-full h-[46px] px-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary/30 focus:border-secondary focus:outline-none transition-all text-sm font-bold shadow-sm"
                                   />
-                                </div>
-                                <div className="space-y-2">
-                                  <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
-                                    Email
-                                  </label>
-                                  <input
-                                    type="email"
-                                    value={editAdminData.email}
-                                    onChange={(e) =>
+                                  <CustomDropdown
+                                    label="Status"
+                                    value={editAdminData.status}
+                                    field={`edit_admin_status_${admin.id}`}
+                                    options={["Active", "Inactive"]}
+                                    onChange={(val) =>
                                       setEditAdminData({
                                         ...editAdminData,
-                                        email: e.target.value,
+                                        status: val,
                                       })
                                     }
-                                    className="w-full h-[46px] px-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary/30 focus:border-secondary focus:outline-none transition-all text-sm font-bold shadow-sm"
+                                  />
+                                  <CustomDropdown
+                                    label="Privileges"
+                                    value={editAdminData.privileges}
+                                    field={`edit_admin_privileges_${admin.id}`}
+                                    options={["Tech", "Media", "Both"]}
+                                    onChange={(val) =>
+                                      setEditAdminData({
+                                        ...editAdminData,
+                                        privileges: val,
+                                      })
+                                    }
                                   />
                                 </div>
-                                <CustomDropdown
-                                  label="Role"
-                                  value={editAdminData.role}
-                                  field={`edit_admin_role_${admin.id}`}
-                                  options={[
-                                    "Root Admin",
-                                    "Admin",
-                                    "Manager",
-                                    "Moderator",
-                                  ]}
-                                  onChange={(val) =>
-                                    setEditAdminData({
-                                      ...editAdminData,
-                                      role: val,
-                                    })
-                                  }
-                                />
-                                <CustomDropdown
-                                  label="Status"
-                                  value={editAdminData.status}
-                                  field={`edit_admin_status_${admin.id}`}
-                                  options={["Active", "Inactive"]}
-                                  onChange={(val) =>
-                                    setEditAdminData({
-                                      ...editAdminData,
-                                      status: val,
-                                    })
-                                  }
-                                />
-                                <CustomDropdown
-                                  label="Privileges"
-                                  value={editAdminData.privileges}
-                                  field={`edit_admin_privileges_${admin.id}`}
-                                  options={["Tech", "Media", "Both"]}
-                                  onChange={(val) =>
-                                    setEditAdminData({
-                                      ...editAdminData,
-                                      privileges: val,
-                                    })
-                                  }
-                                />
+                                <div className="flex gap-3 pt-2">
+                                  <button
+                                    onClick={() =>
+                                      handleSaveEditAdmin(admin.id)
+                                    }
+                                    className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold tracking-wider shadow-lg"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEditAdmin}
+                                    className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
                               </div>
-                              <div className="flex gap-3 pt-2">
-                                <button
-                                  onClick={() => handleSaveEditAdmin(admin.id)}
-                                  className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold tracking-wider shadow-lg"
-                                >
-                                  Save
-                                </button>
-                                <button
-                                  onClick={handleCancelEditAdmin}
-                                  className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[11px] font-bold tracking-wider"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center gap-4 mb-2">
-                                {admin.image ? (
-                                  <img
-                                    src={admin.image}
-                                    alt={admin.name}
-                                    className="w-10 h-10 rounded-xl object-cover border border-slate-200"
-                                    onError={(e) => {
-                                      e.target.style.display = 'none';
-                                      e.target.nextSibling.style.display = 'flex';
-                                    }}
-                                  />
-                                ) : null}
-                                <div 
-                                  className={`w-10 h-10 rounded-xl bg-primary flex items-center justify-center ${admin.image ? 'hidden' : 'flex'}`}
-                                >
-                                  <span className="text-sm font-bold text-white">
-                                    {admin.name?.charAt(0).toUpperCase() || "U"}
+                            ) : (
+                              <>
+                                <div className="flex items-center gap-4 mb-2">
+                                  {admin.image ? (
+                                    <img
+                                      src={admin.image}
+                                      alt={admin.name}
+                                      className="w-10 h-10 rounded-xl object-cover border border-slate-200"
+                                      onError={(e) => {
+                                        e.target.style.display = "none";
+                                        e.target.nextSibling.style.display =
+                                          "flex";
+                                      }}
+                                    />
+                                  ) : null}
+                                  <div
+                                    className={`w-10 h-10 rounded-xl bg-primary flex items-center justify-center ${admin.image ? "hidden" : "flex"}`}
+                                  >
+                                    <span className="text-sm font-bold text-white">
+                                      {admin.name?.charAt(0).toUpperCase() ||
+                                        "U"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <h5 className="font-bold text-slate-900 tracking-tight">
+                                      {admin.name}
+                                    </h5>
+                                    <p className="text-[11px] font-bold text-slate-500">
+                                      {admin.email}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex gap-3 mt-4 ml-14">
+                                  <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-bold  tracking-widest">
+                                    {admin.role}
+                                  </span>
+                                  <span className="inline-block px-3 py-1 bg-green-100/50 border border-green-200 text-green-700 rounded-lg text-[10px] font-bold  tracking-widest">
+                                    {admin.status}
+                                  </span>
+                                  <span className="inline-block px-3 py-1 bg-blue-100/50 border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold  tracking-widest">
+                                    {admin.privileges || "Both"}
                                   </span>
                                 </div>
-                                <div>
-                                  <h5 className="font-bold text-slate-900 tracking-tight">
-                                    {admin.name}
-                                  </h5>
-                                  <p className="text-[11px] font-bold text-slate-500">
-                                    {admin.email}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex gap-3 mt-4 ml-14">
-                                <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-bold  tracking-widest">
-                                  {admin.role}
-                                </span>
-                                <span className="inline-block px-3 py-1 bg-green-100/50 border border-green-200 text-green-700 rounded-lg text-[10px] font-bold  tracking-widest">
-                                  {admin.status}
-                                </span>
-                                <span className="inline-block px-3 py-1 bg-blue-100/50 border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold  tracking-widest">
-                                  {admin.privileges || "Both"}
-                                </span>
-                              </div>
-                            </>
-                          )}
+                              </>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            {editingAdminId !== admin.id &&
+                              admin.role !== "Root Admin" && (
+                                <>
+                                  <button
+                                    onClick={() => handleStartEditAdmin(admin)}
+                                    className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-primary"
+                                    title="Edit admin"
+                                    aria-label="Edit admin"
+                                  >
+                                    <Edit2 size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteAdmin(admin.id)}
+                                    className="p-2 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500"
+                                    title="Delete admin"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </>
+                              )}
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          {editingAdminId !== admin.id && admin.role !== "Root Admin" && (
-                            <>
-                              <button
-                                onClick={() => handleStartEditAdmin(admin)}
-                                className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-primary"
-                                title="Edit admin"
-                                aria-label="Edit admin"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteAdmin(admin.id)}
-                                className="p-2 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500"
-                                title="Delete admin"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
                   )}
                 </div>
 
@@ -1610,7 +1657,9 @@ const Settings = ({
                         <Check size={14} className="text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs font-bold tracking-wide text-center">{adminToastMessage}</p>
+                        <p className="text-xs font-bold tracking-wide text-center">
+                          {adminToastMessage}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1624,14 +1673,18 @@ const Settings = ({
       {/* Generic Toast Notification */}
       {toast.show && (
         <div className="fixed top-6 right-6 z-50 animate-fade-in">
-          <div className={`flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border min-w-[280px] ${
-            toast.type === "success"
-              ? "bg-primary text-white shadow-primary/30 border-white/10"
-              : "bg-red-500 text-white shadow-red-500/30 border-white/10"
-          }`}>
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-              toast.type === "success" ? "bg-white/20" : "bg-white/20"
-            }`}>
+          <div
+            className={`flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border min-w-[280px] ${
+              toast.type === "success"
+                ? "bg-primary text-white shadow-primary/30 border-white/10"
+                : "bg-red-500 text-white shadow-red-500/30 border-white/10"
+            }`}
+          >
+            <div
+              className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                toast.type === "success" ? "bg-white/20" : "bg-white/20"
+              }`}
+            >
               {toast.type === "success" ? (
                 <Check size={14} className="text-white" />
               ) : (
@@ -1648,10 +1701,17 @@ const Settings = ({
       {/* Confirmation Modal */}
       {confirmModal.show && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={hideConfirmModal} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={hideConfirmModal}
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full animate-pop border border-slate-100">
-            <h3 className="text-lg font-bold text-primary mb-2">{confirmModal.title}</h3>
-            <p className="text-sm text-slate-600 mb-6">{confirmModal.message}</p>
+            <h3 className="text-lg font-bold text-primary mb-2">
+              {confirmModal.title}
+            </h3>
+            <p className="text-sm text-slate-600 mb-6">
+              {confirmModal.message}
+            </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={hideConfirmModal}
