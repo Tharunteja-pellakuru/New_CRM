@@ -418,7 +418,7 @@ const Settings = ({
     }
   };
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = async () => {
     if (
       passwordData.currentPassword &&
       passwordData.newPassword &&
@@ -428,16 +428,53 @@ const Settings = ({
         alert("New passwords do not match");
         return;
       }
-      setIsPasswordSaved(true);
-      setTimeout(() => {
-        setIsPasswordSaved(false);
-        setShowPasswordForm(false);
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-      }, 3000);
+
+      try {
+        const userId = profile?.uuid || profile?.id;
+        const response = await fetch(
+          `${BASE_URL}/api/admin-users/update-password/${userId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              currentPassword: passwordData.currentPassword,
+              newPassword: passwordData.newPassword,
+            }),
+          }
+        );
+
+        const contentType = response.headers.get("content-type");
+        let data;
+
+        if (contentType && contentType.includes("application/json")) {
+          data = await response.json();
+        } else {
+          const text = await response.text();
+          console.error("Server returned non-JSON response:", text);
+          alert(`Server error: ${response.status}. Check console for details.`);
+          return;
+        }
+
+        if (response.ok) {
+          setIsPasswordSaved(true);
+          setTimeout(() => {
+            setIsPasswordSaved(false);
+            setShowPasswordForm(false);
+            setPasswordData({
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: "",
+            });
+          }, 3000);
+        } else {
+          alert(data.message || "Failed to update password");
+        }
+      } catch (error) {
+        console.error("Update password error:", error);
+        alert("Server error while updating password. Check console for details.");
+      }
     }
   };
 
