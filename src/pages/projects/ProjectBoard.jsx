@@ -197,7 +197,7 @@ const ProjectCard = ({
     switch (category?.toLowerCase()) {
       case "tech":
         return "bg-secondary/10 text-secondary border-secondary/30";
-      case "media":
+      case "social media":
         return "bg-warning/10 text-warning border-warning/30";
       default:
         return "bg-slate-100 text-slate-600 border-slate-200";
@@ -613,7 +613,7 @@ const ProjectBoard = ({
                           Select Category
                         </p>
                       </div>
-                      {["Tech", "Media"].map((cat) => (
+                      {["Tech", "Social Media"].map((cat) => (
                         <button
                           key={cat}
                           onClick={() => handleCategoryChange(cat)}
@@ -986,7 +986,7 @@ const ProjectBoard = ({
                     PROJECT CATEGORY
                   </label>
                   <div className="flex gap-2">
-                    {["Tech", "Media"].map((cat) => (
+                    {["Tech", "Social Media"].map((cat) => (
                       <button
                         key={cat}
                         type="button"

@@ -1,4 +1,5 @@
 import { BASE_URL } from "../constants/config";
+import { getAuthHeaders } from "../utils/auth";
 
 // AI Analysis API calls through backend (secure - no API keys exposed)
 
@@ -22,7 +23,7 @@ export const generateClientSummary = async (client, projects) => {
     // Call backend API instead of direct API
     const response = await fetch(`${BASE_URL}/api/ai/analyze-enquiry`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiry: {
           name: client.name,
@@ -55,7 +56,7 @@ export const generateEmailDraft = async (client, context) => {
 
     const response = await fetch(`${BASE_URL}/api/ai/analyze-enquiry`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiry: {
           name: client.name,
@@ -83,7 +84,7 @@ export const suggestNextAction = async (client) => {
 
     const response = await fetch(`${BASE_URL}/api/ai/analyze-enquiry`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiry: {
           name: client.name,
@@ -110,7 +111,7 @@ export const analyzeEnquiryRelevance = async (enquiry, apiKey, modelId) => {
   try {
     const response = await fetch(`${BASE_URL}/api/ai/analyze-enquiry`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiry,
         modelId, // optional - backend will use default if not provided
@@ -134,7 +135,7 @@ export const batchAnalyzeEnquiries = async (enquiries, apiKey, modelId) => {
   try {
     const response = await fetch(`${BASE_URL}/api/ai/batch-analyze`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiries,
         modelId, // optional - backend will use default if not provided
@@ -165,7 +166,7 @@ export const analyzeEnquiriesCustomBatch = async (
     // Transform to use the batch analyze endpoint with custom logic
     const response = await fetch(`${BASE_URL}/api/ai/batch-analyze`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         enquiries,
         modelId,

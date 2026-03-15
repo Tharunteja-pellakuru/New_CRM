@@ -15,7 +15,7 @@ const Layout = ({
   // Handle active tab from current URL
   // Default to dashboard, or handle nested routes like /followups/clients
   const pathParts = location.pathname.split("/").filter(Boolean);
-  const activeTab = pathParts.length > 0 ? pathParts.join("-") : "dashboard";
+  const activeTab = pathParts.length > 0 ? pathParts[0] : "dashboard";
 
   return (
     <div className="flex min-h-screen bg-background overflow-x-hidden">

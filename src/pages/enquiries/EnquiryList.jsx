@@ -106,7 +106,7 @@ const EnquiryList = ({
     phone: "",
     website: "",
     leadType: "Hot",
-    leadCategory: "Tech",
+    leadCategory: "Social Media",
     notes: "",
   });
   const [showSimulateForm, setShowSimulateForm] = useState(false);
@@ -329,7 +329,7 @@ const EnquiryList = ({
       phone: enquiry.phone,
       website: enquiry.website,
       leadType: "Warm",
-      leadCategory: "Tech",
+      leadCategory: "Social Media",
       notes: enquiry.message,
     });
     setLeadModalOpen(true);
@@ -1080,7 +1080,7 @@ const EnquiryList = ({
                   Lead Category
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {["Tech", "Media"].map((cat) => (
+                      {["Tech", "Social Media"].map((cat) => (
                     <button
                       key={cat}
                       type="button"

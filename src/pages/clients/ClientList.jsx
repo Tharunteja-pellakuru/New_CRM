@@ -468,7 +468,7 @@ const ClientList = ({
                       className="category-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[9999] animate-fade-in-up origin-top"
                       style={categoryDropdownStyle}
                     >
-                      {["All", "Tech", "Media"].map((cat) => (
+                      {["All", "Tech", "Social Media"].map((cat) => (
                         <button
                           key={cat}
                           onClick={() => {
@@ -610,7 +610,7 @@ const ClientList = ({
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`w-2 h-2 rounded-full ${client.projectCategory === "Tech" ? "bg-secondary" : client.projectCategory === "Media" ? "bg-blue-400" : "bg-slate-300"}`}
+                            className={`w-2 h-2 rounded-full ${client.projectCategory === "Tech" ? "bg-secondary" : client.projectCategory === "Social Media" ? "bg-blue-400" : "bg-slate-300"}`}
                           />
                           <span className="text-sm font-bold text-primary">
                             {client.projectCategory ||
@@ -774,7 +774,7 @@ const ClientList = ({
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <div
-                          className={`w-1.5 h-1.5 rounded-full ${client.projectCategory === "Tech" ? "bg-secondary" : client.projectCategory === "Media" ? "bg-blue-400" : "bg-slate-300"}`}
+                          className={`w-1.5 h-1.5 rounded-full ${client.projectCategory === "Tech" ? "bg-secondary" : client.projectCategory === "Social Media" ? "bg-blue-400" : "bg-slate-300"}`}
                         />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                           {client.projectCategory || client.industry || "Other"}
@@ -1013,7 +1013,7 @@ const ClientList = ({
                       LEAD CATEGORY
                     </label>
                     <div className="flex gap-2">
-                      {["Tech", "Media"].map((cat) => (
+                      {["Tech", "Social Media"].map((cat) => (
                         <button
                           key={cat}
                           type="button"
@@ -1283,7 +1283,7 @@ const ClientList = ({
                         LEAD CATEGORY
                       </label>
                       <div className="flex gap-2">
-                        {["Tech", "Media"].map((cat) => (
+                        {["Tech", "Social Media"].map((cat) => (
                           <button
                             key={cat}
                             type="button"
@@ -1869,7 +1869,7 @@ const ClientList = ({
                     LEAD CATEGORY
                   </label>
                   <div className="flex gap-2">
-                    {["Tech", "Media"].map((cat) => (
+                    {["Tech", "Social Media"].map((cat) => (
                       <button
                         key={cat}
                         type="button"

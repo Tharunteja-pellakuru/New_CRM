@@ -28,6 +28,7 @@ const FollowUpList = ({
   onEditFollowUp,
   onDeleteFollowUp,
   onNavigate,
+  onSelectClient,
   typeFilter = "All",
 }) => {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -37,6 +38,10 @@ const FollowUpList = ({
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
+  const [isHourDropdownOpen, setIsHourDropdownOpen] = useState(false);
+  const [isMinuteDropdownOpen, setIsMinuteDropdownOpen] = useState(false);
+  const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
+  const [clientSearchTerm, setClientSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     clientId: "",
     title: "",
@@ -46,6 +51,9 @@ const FollowUpList = ({
     followup_status: "pending",
     follow_brief: "",
     priority: "Medium",
+    timeHour: "12",
+    timeMinute: "00",
+    timePeriod: "PM",
   });
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -54,8 +62,19 @@ const FollowUpList = ({
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [completionBrief, setCompletionBrief] = useState("");
   const [completingFollowUpId, setCompletingFollowUpId] = useState(null);
+  const [completionDate, setCompletionDate] = useState(new Date().toISOString().split("T")[0]);
+  const [completionHour, setCompletionHour] = useState((new Date().getHours() % 12 || 12).toString());
+  const [completionMinute, setCompletionMinute] = useState(new Date().getMinutes().toString().padStart(2, "0"));
+  const [completionPeriod, setCompletionPeriod] = useState(new Date().getHours() >= 12 ? "PM" : "AM");
+  const [completedBy, setCompletedBy] = useState(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user.full_name || "";
+  });
+  const [isCompHourOpen, setIsCompHourOpen] = useState(false);
+  const [isCompMinOpen, setIsCompMinOpen] = useState(false);
+  const [isCompPeriodOpen, setIsCompPeriodOpen] = useState(false);
 
-  const getClientById = (id) => clients.find((c) => c.id === id);
+  const getClientById = (id) => clients.find((c) => c.id == id);
   const isOverdue = (date) =>
     new Date(date) < new Date(new Date().setHours(0, 0, 0, 0));
   const isToday = (date) => {
@@ -105,7 +124,9 @@ const FollowUpList = ({
 
   // Tab counts
   const tabCounts = {
-    All: baseFiltered.length,
+    All: typeFilter === "Lead" 
+      ? baseFiltered.length 
+      : baseFiltered.filter((f) => f.status !== "completed").length,
     Overdue: baseFiltered.filter(
       (f) => isOverdue(f.dueDate) && f.status === "pending",
     ).length,
@@ -120,7 +141,7 @@ const FollowUpList = ({
 
   const filteredFollowUps = baseFiltered
     .filter((f) => {
-      if (f.status === "completed" && activeFilter !== "All") return false;
+      if (f.status === "completed" && (activeFilter !== "All" || typeFilter !== "Lead")) return false;
       if (activeFilter === "Overdue")
         return isOverdue(f.dueDate) && f.status === "pending";
       if (activeFilter === "Today")
@@ -137,16 +158,28 @@ const FollowUpList = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Convert 12h to 24h for backend
+    let hour = parseInt(formData.timeHour);
+    if (formData.timePeriod === "PM" && hour < 12) hour += 12;
+    if (formData.timePeriod === "AM" && hour === 12) hour = 0;
+    const time24 = `${hour.toString().padStart(2, "0")}:${formData.timeMinute}`;
+
+    // Combine date and time
+    const combinedDateTime = new Date(`${formData.followup_date}T${time24}`).toISOString();
+    
     if (formData.id) {
       onEditFollowUp &&
         onEditFollowUp({
           ...formData,
-          dueDate: new Date(formData.followup_date).toISOString(),
+          dueDate: combinedDateTime,
+          followup_date: combinedDateTime, // Sending combined for backend
         });
     } else {
       onAddFollowUp({
         ...formData,
-        dueDate: new Date(formData.followup_date).toISOString(),
+        dueDate: combinedDateTime,
+        followup_date: combinedDateTime, // Sending combined for backend
       });
     }
     setShowAddModal(false);
@@ -159,6 +192,9 @@ const FollowUpList = ({
       followup_status: "pending",
       follow_brief: "",
       priority: "Medium",
+      timeHour: "12",
+      timeMinute: "00",
+      timePeriod: "PM",
     });
   };
 
@@ -251,7 +287,7 @@ const FollowUpList = ({
                     onClick={() => setIsCategoryDropdownOpen(false)}
                   />
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
-                    {["All", "Tech", "Media"].map((cat) => (
+                    {["All", "Tech", "Social Media"].map((cat) => (
                       <button
                         key={cat}
                         onClick={() => {
@@ -332,7 +368,8 @@ const FollowUpList = ({
                         setShowCompletionModal(true);
                       }
                     }}
-                    className={`w-8 h-8 rounded-lg border-2 transition-all flex items-center justify-center shrink-0 mt-1 ${f.status === "completed" ? "bg-success border-success text-white" : "bg-white border-slate-100 text-transparent hover:border-secondary"}`}
+                    className={`w-8 h-8 rounded-lg border-2 transition-all flex items-center justify-center shrink-0 mt-1 ${f.status === "completed" ? "bg-success border-success text-white" : "bg-white border-slate-200 text-slate-300 hover:border-success hover:text-success hover:bg-success/5"}`}
+                    title={f.status === "completed" ? "Mark as Pending" : "Mark as Completed"}
                   >
                     {f.status === "completed" ? (
                       <Check size={16} strokeWidth={4} />
@@ -374,6 +411,11 @@ const FollowUpList = ({
                         {new Date(f.dueDate).toLocaleDateString([], {
                           month: "short",
                           day: "numeric",
+                        })}{" · "}
+                        {new Date(f.dueDate).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
                         })}
                       </div>
                       {f.projectName && (
@@ -382,10 +424,13 @@ const FollowUpList = ({
                           {f.projectName}
                         </div>
                       )}
-                      <div className="flex items-center gap-1.5 text-[10px] text-textMuted font-bold  tracking-widest">
+                      <button 
+                        onClick={() => client && onSelectClient && onSelectClient(client)}
+                        className="flex items-center gap-1.5 text-[10px] text-textMuted font-bold  tracking-widest hover:text-secondary hover:underline transition-all"
+                      >
                         <span className="text-secondary">•</span>
                         {client?.name}
-                      </div>
+                      </button>
                     </div>
                     {f.status === "completed" && f.follow_brief && (
                       <div className="mt-2 px-3 py-2 bg-success/5 border border-success/20 rounded-lg">
@@ -405,10 +450,20 @@ const FollowUpList = ({
                         e.stopPropagation();
                         setFormData({
                           ...f,
+                          followup_status: "pending",
                           followup_date: f.dueDate
                             ? new Date(f.dueDate).toISOString().split("T")[0]
                             : f.followup_date ||
                               new Date().toISOString().split("T")[0],
+                          timeHour: f.dueDate 
+                            ? (new Date(f.dueDate).getHours() % 12 || 12).toString() 
+                            : "12",
+                          timeMinute: f.dueDate 
+                            ? new Date(f.dueDate).getMinutes().toString().padStart(2, "0") 
+                            : "00",
+                          timePeriod: f.dueDate 
+                            ? (new Date(f.dueDate).getHours() >= 12 ? "PM" : "AM") 
+                            : "PM",
                         });
                         setShowAddModal(true);
                       }}
@@ -468,7 +523,7 @@ const FollowUpList = ({
                     </div>
                   </div>
                 </div>
-                <div className="p-5 space-y-4">
+                <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
                       Conclusion Brief
@@ -482,12 +537,106 @@ const FollowUpList = ({
                       rows="3"
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                        Completion Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium shadow-sm focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none"
+                        value={completionDate}
+                        onChange={(e) => setCompletionDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                        Completion Time
+                      </label>
+                      <div className="flex gap-2">
+                        {/* Hour */}
+                        <div className="flex-1 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsCompHourOpen(!isCompHourOpen)}
+                            className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold shadow-sm"
+                          >
+                            <span>{completionHour.padStart(2, '0')}</span>
+                            <ChevronDown size={12} />
+                          </button>
+                          {isCompHourOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-100 rounded-lg shadow-xl z-[100] max-h-32 overflow-y-auto">
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                                <button key={h} type="button" onClick={() => { setCompletionHour(h.toString()); setIsCompHourOpen(false); }} className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-slate-50">{h.toString().padStart(2, '0')}</button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {/* Minute */}
+                        <div className="flex-1 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsCompMinOpen(!isCompMinOpen)}
+                            className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold shadow-sm"
+                          >
+                            <span>{completionMinute}</span>
+                            <ChevronDown size={12} />
+                          </button>
+                          {isCompMinOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-100 rounded-lg shadow-xl z-[100] max-h-32 overflow-y-auto">
+                              {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
+                                <button key={m} type="button" onClick={() => { setCompletionMinute(m.toString().padStart(2, '0')); setIsCompMinOpen(false); }} className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-slate-50">{m.toString().padStart(2, '0')}</button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {/* Period */}
+                        <div className="w-14 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsCompPeriodOpen(!isCompPeriodOpen)}
+                            className="w-full flex items-center justify-between px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold shadow-sm"
+                          >
+                            <span>{completionPeriod}</span>
+                            <ChevronDown size={12} />
+                          </button>
+                          {isCompPeriodOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-100 rounded-lg shadow-xl z-[100]">
+                              {["AM", "PM"].map(p => (
+                                <button key={p} type="button" onClick={() => { setCompletionPeriod(p); setIsCompPeriodOpen(false); }} className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-slate-50">{p}</button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                      Completed By
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium shadow-sm focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none"
+                      value={completedBy}
+                      onChange={(e) => setCompletedBy(e.target.value)}
+                    />
+                  </div>
+
                   <div className="pt-2">
                     <button
                       type="button"
                       onClick={() => {
                         if (completingFollowUpId) {
-                          onToggleStatus(completingFollowUpId, completionBrief);
+                          let hour = parseInt(completionHour);
+                          if (completionPeriod === "PM" && hour < 12) hour += 12;
+                          if (completionPeriod === "AM" && hour === 12) hour = 0;
+                          const time24 = `${hour.toString().padStart(2, "0")}:${completionMinute}:00`;
+                          const completedAt = `${completionDate} ${time24}`;
+
+                          onToggleStatus(completingFollowUpId, completionBrief, completedAt, completedBy);
                         }
                         setShowCompletionModal(false);
                         setCompletingFollowUpId(null);
@@ -518,10 +667,14 @@ const FollowUpList = ({
                       title: "",
                       description: "",
                       followup_date: new Date().toISOString().split("T")[0],
+                      followup_time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
                       followup_mode: "call",
                       followup_status: "pending",
                       follow_brief: "",
                       priority: "Medium",
+                      timeHour: "12",
+                      timeMinute: "00",
+                      timePeriod: "PM",
                     });
                   }}
                   className="absolute top-4 right-4 p-1.5 hover:bg-white/10 rounded-xl transition-colors"
@@ -577,29 +730,74 @@ const FollowUpList = ({
                             className="fixed inset-0 z-[80]"
                             onClick={() => setIsClientDropdownOpen(false)}
                           />
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top max-h-60 overflow-y-auto">
-                            <div className="sticky top-0 bg-[#18254D] px-4 py-3 border-b border-white/10 z-10">
-                              <p className="text-[9px] font-bold text-white/50  tracking-widest">
-                                Select Client
-                              </p>
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top max-h-80 flex flex-col">
+                            <div className="sticky top-0 bg-[#18254D] z-10">
+                              <div className="px-4 py-3 border-b border-white/10">
+                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                                  Select {typeFilter === "Active" ? "Client" : typeFilter === "Lead" ? "Lead" : "Client/Lead"}
+                                </p>
+                              </div>
+                              <div className="p-2 border-b border-slate-100 bg-slate-50">
+                                <div className="relative">
+                                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                                  <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-secondary transition-colors"
+                                    value={clientSearchTerm}
+                                    onChange={(e) => setClientSearchTerm(e.target.value)}
+                                    autoFocus
+                                  />
+                                </div>
+                              </div>
                             </div>
-                            {clients.map((c) => (
-                              <button
-                                key={c.id}
-                                type="button"
-                                onClick={() => {
-                                  setFormData({ ...formData, clientId: c.id });
-                                  setIsClientDropdownOpen(false);
-                                }}
-                                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
-                                  formData.clientId === c.id
-                                    ? "bg-slate-100 text-secondary"
-                                    : "text-[#18254D] hover:bg-slate-50"
-                                }`}
-                              >
-                                {c.name}
-                              </button>
-                            ))}
+                            <div className="overflow-y-auto max-h-60">
+                              {clients
+                                .filter(c => {
+                                  // Type filtering if needed
+                                  if (typeFilter === "Active" && c.status !== "Active") return false;
+                                  if (typeFilter === "Lead" && c.status !== "Lead") return false;
+                                  
+                                  // Search filtering
+                                  if (!clientSearchTerm.trim()) return true;
+                                  const q = clientSearchTerm.toLowerCase();
+                                  return c.name?.toLowerCase().includes(q) || c.company?.toLowerCase().includes(q);
+                                })
+                                .map((c) => (
+                                  <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setFormData({ ...formData, clientId: c.id });
+                                      setIsClientDropdownOpen(false);
+                                      setClientSearchTerm("");
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                                      formData.clientId === c.id
+                                        ? "bg-slate-100 text-secondary"
+                                        : "text-[#18254D] hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span>{c.name}</span>
+                                      {c.company && (
+                                        <span className="text-[8px] opacity-50">{c.company}</span>
+                                      )}
+                                    </div>
+                                  </button>
+                                ))}
+                              {clients.filter(c => {
+                                if (typeFilter === "Active" && c.status !== "Active") return false;
+                                if (typeFilter === "Lead" && c.status !== "Lead") return false;
+                                if (!clientSearchTerm.trim()) return true;
+                                const q = clientSearchTerm.toLowerCase();
+                                return c.name?.toLowerCase().includes(q) || c.company?.toLowerCase().includes(q);
+                              }).length === 0 && (
+                                <div className="px-4 py-6 text-center">
+                                  <p className="text-[10px] font-bold text-slate-400 italic">No results found</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </>
                       )}
@@ -675,63 +873,203 @@ const FollowUpList = ({
 
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
-                        Follow-up Mode
+                        Follow-up Time (12h)
                       </label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setIsModeDropdownOpen(!isModeDropdownOpen)
-                          }
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
-                        >
-                          <span className="text-primary capitalize">
-                            {formData.followup_mode}
-                          </span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform ${isModeDropdownOpen ? "rotate-180" : ""}`}
-                          />
-                        </button>
-
-                        {isModeDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-[80]"
-                              onClick={() => setIsModeDropdownOpen(false)}
-                            />
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
-                              <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
-                                  Select Mode
-                                </p>
-                              </div>
-                              {["call", "email", "meeting", "whatsapp"].map(
-                                (mode) => (
+                      <div className="flex gap-2 relative">
+                        {/* Hour Dropdown */}
+                        <div className="flex-1 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsHourDropdownOpen(!isHourDropdownOpen)}
+                            className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
+                          >
+                            <span>{formData.timeHour.padStart(2, '0')}</span>
+                            <ChevronDown size={14} className={`text-slate-400 transition-transform ${isHourDropdownOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          {isHourDropdownOpen && (
+                            <>
+                              <div className="fixed inset-0 z-[80]" onClick={() => setIsHourDropdownOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-y-auto max-h-48 z-[90] animate-fade-in-up origin-top">
+                                {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
                                   <button
-                                    key={mode}
+                                    key={h}
                                     type="button"
                                     onClick={() => {
-                                      setFormData({
-                                        ...formData,
-                                        followup_mode: mode,
-                                      });
-                                      setIsModeDropdownOpen(false);
+                                      setFormData({ ...formData, timeHour: h.toString() });
+                                      setIsHourDropdownOpen(false);
                                     }}
-                                    className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors capitalize ${
-                                      formData.followup_mode === mode
-                                        ? "bg-slate-100 text-secondary"
-                                        : "text-[#18254D] hover:bg-slate-50"
-                                    }`}
+                                    className={`w-full text-left px-4 py-2 text-[10px] font-bold tracking-widest transition-colors ${formData.timeHour === h.toString() ? "bg-slate-100 text-secondary" : "text-[#18254D] hover:bg-slate-50"}`}
                                   >
-                                    {mode}
+                                    {h.toString().padStart(2, '0')}
                                   </button>
-                                ),
-                              )}
-                            </div>
-                          </>
-                        )}
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Minute Dropdown */}
+                        <div className="flex-1 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsMinuteDropdownOpen(!isMinuteDropdownOpen)}
+                            className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
+                          >
+                            <span>{formData.timeMinute}</span>
+                            <ChevronDown size={14} className={`text-slate-400 transition-transform ${isMinuteDropdownOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          {isMinuteDropdownOpen && (
+                            <>
+                              <div className="fixed inset-0 z-[80]" onClick={() => setIsMinuteDropdownOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-y-auto max-h-48 z-[90] animate-fade-in-up origin-top">
+                                {Array.from({ length: 60 }, (_, i) => i).map(m => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => {
+                                      setFormData({ ...formData, timeMinute: m.toString().padStart(2, '0') });
+                                      setIsMinuteDropdownOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2 text-[10px] font-bold tracking-widest transition-colors ${formData.timeMinute === m.toString().padStart(2, '0') ? "bg-slate-100 text-secondary" : "text-[#18254D] hover:bg-slate-50"}`}
+                                  >
+                                    {m.toString().padStart(2, '0')}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Period Dropdown */}
+                        <div className="w-20 relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
+                            className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
+                          >
+                            <span>{formData.timePeriod}</span>
+                            <ChevronDown size={14} className={`text-slate-400 transition-transform ${isPeriodDropdownOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          {isPeriodDropdownOpen && (
+                            <>
+                              <div className="fixed inset-0 z-[80]" onClick={() => setIsPeriodDropdownOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
+                                {["AM", "PM"].map(p => (
+                                  <button
+                                    key={p}
+                                    type="button"
+                                    onClick={() => {
+                                      setFormData({ ...formData, timePeriod: p });
+                                      setIsPeriodDropdownOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-[10px] font-bold tracking-widest transition-colors ${formData.timePeriod === p ? "bg-slate-100 text-secondary" : "text-[#18254D] hover:bg-slate-50"}`}
+                                  >
+                                    {p}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                      Priority
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
+                      >
+                        <span className={`capitalize ${getPriorityBadge(formData.priority)} px-2 py-0.5 rounded text-[10px]`}>
+                          {formData.priority}
+                        </span>
+                        <ChevronDown size={16} className={`text-slate-400 transition-transform ${isPriorityDropdownOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      {isPriorityDropdownOpen && (
+                        <>
+                          <div className="fixed inset-0 z-[80]" onClick={() => setIsPriorityDropdownOpen(false)} />
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
+                            {["Low", "Medium", "High"].map((p) => (
+                              <button
+                                key={p}
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, priority: p });
+                                  setIsPriorityDropdownOpen(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold tracking-widest transition-colors ${formData.priority === p ? "bg-slate-100 text-secondary" : "text-[#18254D] hover:bg-slate-50"}`}
+                              >
+                                {p}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                      Follow-up Mode
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIsModeDropdownOpen(!isModeDropdownOpen)
+                        }
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
+                      >
+                        <span className="text-primary capitalize">
+                          {formData.followup_mode}
+                        </span>
+                        <ChevronDown
+                          size={16}
+                          className={`text-slate-400 transition-transform ${isModeDropdownOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+
+                      {isModeDropdownOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-[80]"
+                            onClick={() => setIsModeDropdownOpen(false)}
+                          />
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
+                            <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
+                              <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                                Select Mode
+                              </p>
+                            </div>
+                            {["call", "email", "meeting", "whatsapp"].map(
+                              (mode) => (
+                                <button
+                                  key={mode}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({
+                                      ...formData,
+                                      followup_mode: mode,
+                                    });
+                                    setIsModeDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors capitalize ${
+                                    formData.followup_mode === mode
+                                      ? "bg-slate-100 text-secondary"
+                                      : "text-[#18254D] hover:bg-slate-50"
+                                  }`}
+                                >
+                                  {mode}
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -770,8 +1108,7 @@ const FollowUpList = ({
                             </div>
                             {[
                               "pending",
-                              "completed",
-                              "rescheduled",
+                              "reschedule",
                               "cancelled",
                             ].map((status) => (
                               <button
@@ -790,7 +1127,7 @@ const FollowUpList = ({
                                     : "text-[#18254D] hover:bg-slate-50"
                                 }`}
                               >
-                                {status}
+                                {status === "reschedule" ? "Rescheduled" : status}
                               </button>
                             ))}
                           </div>
@@ -798,6 +1135,7 @@ const FollowUpList = ({
                       )}
                     </div>
                   </div>
+
                 </div>
                 <div className="pt-2">
                   <button

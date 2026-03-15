@@ -58,7 +58,7 @@ export const MOCK_CLIENTS = [
     joinedDate: "2023-01-10",
     lastContact: "2023-11-15",
     industry: "Real Estate",
-    projectCategory: "Media",
+    projectCategory: "Social Media",
     notes:
       "Long-term client. Satisfied with the current CRM flow. Looking to upgrade to the enterprise plan.",
   },
@@ -119,7 +119,7 @@ export const MOCK_CLIENTS = [
     joinedDate: "2023-06-10",
     lastContact: "2023-11-20",
     industry: "Construction",
-    projectCategory: "Media",
+    projectCategory: "Social Media",
     notes: "Long-standing partner. Multiple project tracking. Very satisfied.",
   },
   {
@@ -194,7 +194,7 @@ export const MOCK_CLIENTS = [
     joinedDate: "2023-09-14",
     lastContact: "2023-11-20",
     industry: "Hospitality",
-    projectCategory: "Media",
+    projectCategory: "Social Media",
     notes:
       "Multi-property rollout. Satisfied with customization. Referral source.",
   },
@@ -660,7 +660,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-05-12",
     progress: 5,
     priority: "Medium",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p42",
@@ -671,7 +671,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-05-25",
     progress: 8,
     priority: "High",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p43",
@@ -682,7 +682,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-06-10",
     progress: 2,
     priority: "High",
-    category: "Media",
+    category: "Social Media",
   },
 
   // IN PROGRESS - Status: In Progress (10)
@@ -811,7 +811,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-03-12",
     progress: 40,
     priority: "Medium",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p45",
@@ -822,7 +822,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-03-08",
     progress: 55,
     priority: "Low",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p46",
@@ -833,7 +833,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-03-18",
     progress: 30,
     priority: "High",
-    category: "Media",
+    category: "Social Media",
   },
 
   // TESTING - Status: Testing (10)
@@ -956,7 +956,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-02-26",
     progress: 100,
     priority: "High",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p48",
@@ -967,7 +967,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-02-28",
     progress: 100,
     priority: "Medium",
-    category: "Media",
+    category: "Social Media",
   },
 
   // LIVE - Status: Live (10)
@@ -1090,7 +1090,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-12-31",
     progress: 100,
     priority: "Medium",
-    category: "Media",
+    category: "Social Media",
   },
   {
     id: "p50",
@@ -1101,7 +1101,7 @@ export const MOCK_PROJECTS = [
     deadline: "2026-12-31",
     progress: 100,
     priority: "Critical",
-    category: "Media",
+    category: "Social Media",
   },
 ];
 

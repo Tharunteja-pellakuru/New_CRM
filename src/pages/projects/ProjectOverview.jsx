@@ -110,7 +110,7 @@ const ProjectOverview = ({
     switch (category?.toLowerCase()) {
       case "tech":
         return "bg-secondary/10 text-secondary border-secondary/30";
-      case "media":
+      case "social media":
         return "bg-warning/10 text-warning border-warning/30";
       default:
         return "bg-slate-100 text-slate-600 border-slate-200";
@@ -393,7 +393,7 @@ const ProjectOverview = ({
                   label="Project Category"
                   value={formData.category}
                   field="category"
-                  options={["Tech", "Media"]}
+                  options={["Tech", "Social Media"]}
                   icon={Tag}
                 />
               ) : (

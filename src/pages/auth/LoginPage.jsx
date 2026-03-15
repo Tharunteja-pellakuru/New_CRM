@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, Leaf } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Leaf,
+} from "lucide-react";
 import logoImg from "../../assets/Parivartan_Logo.png";
 
 function LoginPage({ onLogin }) {
-  const [email, setEmail] = useState("chaitanya@parivartan.crm");
+  const [email, setEmail] = useState("crm@eparivartan.com");
   const [password, setPassword] = useState("Password@123");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -179,6 +187,6 @@ function LoginPage({ onLogin }) {
       </div>
     </div>
   );
-};
+}
 
 export default LoginPage;

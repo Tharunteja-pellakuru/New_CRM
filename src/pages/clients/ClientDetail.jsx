@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   Mail,
@@ -20,6 +21,11 @@ import {
   Flame,
   Sun,
   Snowflake,
+  Search,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Globe,
 } from "lucide-react";
 import { MOCK_PROJECTS, MOCK_ACTIVITIES } from "../../constants/mockData";
 import {
@@ -27,6 +33,7 @@ import {
   suggestNextAction,
 } from "../../services/aiService";
 import DatePicker from "../../components/ui/DatePicker";
+import { countries } from "../../utils/countries";
 
 const ClientDetail = ({
   client,
@@ -34,9 +41,11 @@ const ClientDetail = ({
   onUpdateClient,
   onAddActivity,
   activities,
+  followUps = [],
   initialTab = "overview",
   onSelectProject,
 }) => {
+  const isLead = client.status === "Lead" || client.status === "Dismissed";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [nextAction, setNextAction] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
@@ -48,7 +57,26 @@ const ClientDetail = ({
     notes: "",
     website: "",
     projectCategory: "Tech",
+    country: "",
   });
+
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countrySearchTerm, setCountrySearchTerm] = useState("");
+  const countryButtonRef = useRef(null);
+  const [countryDropdownStyle, setCountryDropdownStyle] = useState({});
+
+  useEffect(() => {
+    if (isCountryDropdownOpen && countryButtonRef.current) {
+      const rect = countryButtonRef.current.getBoundingClientRect();
+      setCountryDropdownStyle({
+        position: "fixed",
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        zIndex: 9999,
+      });
+    }
+  }, [isCountryDropdownOpen]);
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -65,6 +93,7 @@ const ClientDetail = ({
         notes: client.notes || "",
         website: client.website || "",
         projectCategory: client.projectCategory || client.industry || "Tech",
+        country: client.country || "",
       });
     }
   }, [showEditModal, client]);
@@ -80,6 +109,9 @@ const ClientDetail = ({
 
   const clientProjects = MOCK_PROJECTS.filter((p) => p.clientId === client.id);
   const clientActivities = activities.filter((a) => a.clientId === client.id);
+  const completedFollowUps = followUps.filter(
+    (f) => f.clientId == client.id && f.status === "completed"
+  );
 
   const handleLogInteraction = (e) => {
     e.preventDefault();
@@ -124,7 +156,7 @@ const ClientDetail = ({
                 </h2>
                 <div className="flex items-center gap-2.5 text-[11px] text-textMuted font-bold  tracking-widest truncate">
                   <span className="truncate">
-                    {client.status === "Lead"
+                    {isLead
                       ? client.company || "Independent"
                       : client.projectName ||
                       client.company ||
@@ -138,7 +170,7 @@ const ClientDetail = ({
             </div>
           </div>
           <div className="flex gap-3 w-full lg:w-auto">
-            {client.status === "Lead" && (
+            {isLead && (
               <button
                 onClick={() => {
                   setShowEditModal(true);
@@ -174,7 +206,7 @@ const ClientDetail = ({
                     </div>
                     <div>
                       <h3 className="text-base font-bold tracking-tighter leading-none">
-                        Edit Lead Details
+                        Edit {isLead ? "Lead" : "Client"} Details
                       </h3>
                       <p className="text-secondary text-[9px] font-bold  tracking-widest mt-0.5">
                         Update primary contact information
@@ -197,6 +229,7 @@ const ClientDetail = ({
                           notes: editFormData.notes,
                           website: editFormData.website,
                           projectCategory: editFormData.projectCategory,
+                          country: editFormData.country,
                         };
                         console.log("=== FORM SUBMISSION DEBUG ===");
                         console.log("Submitting edit form with data:", formDataToSubmit);
@@ -222,7 +255,7 @@ const ClientDetail = ({
                     <input
                       required
                       type="text"
-                      placeholder="e.g. Anand Kumar"
+                      placeholder="e.g. Sameer Kapoor"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={editFormData.name}
                       onChange={(e) =>
@@ -241,7 +274,7 @@ const ClientDetail = ({
                     <input
                       required
                       type="email"
-                      placeholder="e.g. anand.kumar@fintech.in"
+                      placeholder="sameer@fintech.com"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={editFormData.email}
                       onChange={(e) =>
@@ -253,6 +286,89 @@ const ClientDetail = ({
                     />
                   </div>
 
+                  <div className="space-y-2 relative">
+                    <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                      Country Code
+                    </label>
+                    <button
+                      type="button"
+                      ref={countryButtonRef}
+                      onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium transition-all"
+                    >
+                      <span className={editFormData.country ? "text-primary" : "text-slate-400"}>
+                        {editFormData.country
+                          ? (countries.find((c) => c.code === editFormData.country)?.name || "Country") + " (" + editFormData.country + ")"
+                          : "Select Country Code"}
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className={`text-slate-400 transition-transform duration-300 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {isCountryDropdownOpen &&
+                      createPortal(
+                        <>
+                          <div
+                            className="fixed inset-0 z-[9998]"
+                            onClick={() => setIsCountryDropdownOpen(false)}
+                          />
+                          <div
+                            className="country-dropdown bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-[9999] animate-fade-in flex flex-col"
+                            style={countryDropdownStyle}
+                          >
+                            <div className="p-2 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
+                              <Search size={14} className="text-slate-400 ml-1" />
+                              <input
+                                autoFocus
+                                type="text"
+                                placeholder="Search country or code..."
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium p-1"
+                                value={countrySearchTerm}
+                                onChange={(e) => setCountrySearchTerm(e.target.value)}
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto py-1">
+                              {countries
+                                .filter(
+                                  (c) =>
+                                    c.name.toLowerCase().includes(countrySearchTerm.toLowerCase()) ||
+                                    c.code.includes(countrySearchTerm)
+                                )
+                                .map((c) => (
+                                  <button
+                                    key={c.name + c.code}
+                                    type="button"
+                                    onClick={() => {
+                                      setEditFormData({ ...editFormData, country: c.code });
+                                      setIsCountryDropdownOpen(false);
+                                      setCountrySearchTerm("");
+                                    }}
+                                    className={`w-full flex items-center justify-between px-4 py-2 hover:bg-slate-50 transition-colors text-left ${
+                                      editFormData.country === c.code ? "bg-secondary/5" : ""
+                                    }`}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-bold text-primary">
+                                        {c.name}
+                                      </span>
+                                      <span className="text-[10px] text-slate-400 font-bold tracking-widest">
+                                        {c.code}
+                                      </span>
+                                    </div>
+                                    {editFormData.country === c.code && (
+                                      <Check size={16} className="text-secondary" />
+                                    )}
+                                  </button>
+                                ))}
+                            </div>
+                          </div>
+                        </>,
+                        document.body
+                      )}
+                  </div>
+
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
                       Phone Number
@@ -260,6 +376,7 @@ const ClientDetail = ({
                     <input
                       required
                       type="tel"
+                      placeholder="e.g. +91 98765 43210"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={editFormData.phone}
                       onChange={(e) =>
@@ -276,8 +393,8 @@ const ClientDetail = ({
                       Website Url
                     </label>
                     <input
-                      type="url"
-                      placeholder="e.g. https://www.company.com"
+                      type="text"
+                      placeholder="e.g. www.fintech.com"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={editFormData.website}
                       onChange={(e) =>
@@ -291,7 +408,7 @@ const ClientDetail = ({
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
-                      Lead Category
+                      {isLead ? "Lead" : "Client"} Category
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {["Tech", "Social Media"].map((cat) => (
@@ -320,7 +437,7 @@ const ClientDetail = ({
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
-                      Lead Status
+                      {isLead ? "Lead Status" : "Project Status"}
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                       {["Hot", "Warm", "Cold"].map((type) => (
@@ -363,7 +480,7 @@ const ClientDetail = ({
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="Add any additional context..."
+                      placeholder="e.g. Additional details about the project requirements or client background..."
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-bold resize-none"
                       value={editFormData.notes}
                       onChange={(e) =>
@@ -380,7 +497,7 @@ const ClientDetail = ({
                       type="submit"
                       className="w-full py-3 bg-[#18254D] text-white rounded-xl text-[11px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3"
                     >
-                      Update Lead
+                      Update {isLead ? "Lead" : "Client"}
                     </button>
                   </div>
                 </form>
@@ -447,11 +564,11 @@ const ClientDetail = ({
                     </div>
                   </div>
 
-                  {client.status !== "Lead" && (
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
-                        Project Name
-                      </label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                      {isLead ? "Subject" : "Project Name"}
+                    </label>
+                    {!isLead && (
                       <select
                         required
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium appearance-none cursor-pointer"
@@ -486,8 +603,8 @@ const ClientDetail = ({
                           </>
                         )}
                       </select>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
@@ -521,7 +638,7 @@ const ClientDetail = ({
                     </label>
                     <textarea
                       required
-                      placeholder="Summary of the discussion..."
+                      placeholder="e.g. Discussed new service package and finalized onboarding steps..."
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-bold min-h-[100px] resize-none"
                       value={logData.description}
                       onChange={(e) =>
@@ -563,9 +680,22 @@ const ClientDetail = ({
                   <div className="flex items-center gap-4 p-3.5 bg-white rounded-xl border border-slate-100 shadow-sm group">
                     <Phone size={14} className="text-slate-400 shrink-0" />
                     <span className="text-xs font-bold text-primary truncate">
-                      {client.phone}
+                      {client.country ? `${client.country} ` : ""}{client.phone}
                     </span>
                   </div>
+                  {client.website && (
+                    <a
+                      href={client.website.startsWith("http") ? client.website : `https://${client.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-3.5 bg-white rounded-xl border border-slate-100 shadow-sm group hover:border-secondary transition-all"
+                    >
+                      <Globe size={14} className="text-slate-400 group-hover:text-secondary shrink-0" />
+                      <span className="text-xs font-bold text-primary truncate group-hover:text-secondary">
+                        {client.website.replace(/^https?:\/\//, "")}
+                      </span>
+                    </a>
+                  )}
                 </div>
               </div>
               <div>
@@ -587,12 +717,9 @@ const ClientDetail = ({
                   { id: "overview", label: "Overview" },
                   {
                     id: "activity",
-                    label:
-                      client.status === "Lead"
-                        ? "Conversations"
-                        : "Conversations",
+                    label: "Conversations",
                   },
-                  ...(client.status !== "Lead"
+                  ...(!isLead
                     ? [{ id: "projects", label: "Projects" }]
                     : []),
                 ].map((tab) => (
@@ -610,7 +737,7 @@ const ClientDetail = ({
             <div className="flex-1 overflow-y-auto p-4 md:p-6 no-scrollbar bg-white">
               {activeTab === "overview" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-                  {client.status === "Lead" ? (
+                  {isLead ? (
                     <>
                       <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 group relative overflow-hidden hover:shadow-md hover:border-secondary/30 transition-all">
                         <div className="w-8 h-8 bg-secondary/10 text-secondary rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary group-hover:text-white transition-all border border-secondary/20">
@@ -710,73 +837,147 @@ const ClientDetail = ({
                     <h3 className="text-sm font-bold text-primary tracking-tight">
                       Lead Conversations
                     </h3>
-                    <button
-                      onClick={() => setIsLogging(true)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-xl text-[10px] font-bold  tracking-widest hover:bg-[#1e2e5e] transition-all shadow-lg active:scale-95"
-                    >
-                      <Plus size={14} /> Log Entry
-                    </button>
+                    {!isLead && (
+                      <button
+                        onClick={() => setIsLogging(true)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-xl text-[10px] font-bold  tracking-widest hover:bg-[#1e2e5e] transition-all shadow-lg active:scale-95"
+                      >
+                        <Plus size={14} /> Log Entry
+                      </button>
+                    )}
                   </div>
 
-                  {client.status === "Lead" ? (
+                  {isLead ? (
                     /* Lead: Simple flat timeline, no project grouping */
                     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                       <div className="p-4">
                         <div className="relative border-l-2 border-slate-100 ml-3 space-y-4">
-                          {clientActivities.length === 0 ? (
+                          {clientActivities.length === 0 && completedFollowUps.length === 0 ? (
                             <p className="ml-6 text-[10px] font-bold text-slate-300  tracking-widest py-4">
                               No conversations logged yet
                             </p>
                           ) : (
-                            clientActivities.map((conv) => (
-                              <div key={conv.id} className="ml-6 relative">
-                                <div
-                                  className={`absolute -left-[33px] w-6 h-6 rounded-lg flex items-center justify-center text-white shadow-sm z-10 ${conv.type === "email"
-                                    ? "bg-info"
-                                    : conv.type === "call"
-                                      ? "bg-success"
-                                      : conv.type === "meeting"
-                                        ? "bg-secondary"
-                                        : "bg-slate-400"
-                                    }`}
-                                >
-                                  {conv.type === "call" ? (
-                                    <Phone size={11} strokeWidth={2.5} />
-                                  ) : conv.type === "meeting" ? (
-                                    <Calendar size={11} strokeWidth={2.5} />
-                                  ) : (
-                                    <Mail size={11} strokeWidth={2.5} />
-                                  )}
-                                </div>
-                                <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
-                                  <div className="flex items-center justify-between mb-1.5">
-                                    <span className="text-[9px] font-bold text-slate-400  tracking-widest">
-                                      {new Date(conv.date).toLocaleDateString(
-                                        [],
-                                        {
-                                          month: "short",
-                                          day: "numeric",
-                                          year: "numeric",
-                                        },
-                                      )}
-                                    </span>
-                                    <span
-                                      className={`text-[8px] font-bold  tracking-widest px-2 py-0.5 rounded-md ${conv.type === "call"
-                                        ? "bg-success/10 text-success"
-                                        : conv.type === "meeting"
-                                          ? "bg-secondary/10 text-secondary"
-                                          : "bg-info/10 text-info"
-                                        }`}
-                                    >
-                                      {conv.type}
-                                    </span>
+                            <>
+                              {completedFollowUps.map((fu) => (
+                                <div key={`fu-${fu.id}`} className="ml-6 relative">
+                                  <div className={`absolute -left-[33px] w-6 h-6 rounded-lg flex items-center justify-center text-white shadow-sm z-10 ${
+                                    fu.followup_mode?.toLowerCase() === "call" ? "bg-success"
+                                    : fu.followup_mode?.toLowerCase() === "email" ? "bg-info"
+                                    : fu.followup_mode?.toLowerCase() === "meeting" ? "bg-secondary"
+                                    : fu.followup_mode?.toLowerCase() === "whatsapp" ? "bg-[#25D366]"
+                                    : "bg-success"
+                                  }`}>
+                                    {fu.followup_mode?.toLowerCase() === "call" ? (
+                                      <Phone size={11} strokeWidth={2.5} />
+                                    ) : fu.followup_mode?.toLowerCase() === "email" ? (
+                                      <Mail size={11} strokeWidth={2.5} />
+                                    ) : fu.followup_mode?.toLowerCase() === "meeting" ? (
+                                      <Calendar size={11} strokeWidth={2.5} />
+                                    ) : fu.followup_mode?.toLowerCase() === "whatsapp" ? (
+                                      <MessageSquare size={11} strokeWidth={2.5} />
+                                    ) : (
+                                      <Phone size={11} strokeWidth={2.5} />
+                                    )}
                                   </div>
-                                  <p className="text-[12px] font-medium text-primary leading-relaxed">
-                                    {conv.description}
-                                  </p>
+                                  <div className="bg-success/5 p-3 rounded-xl border border-success/20 hover:border-success/40 transition-all">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                      <span className="text-[9px] font-bold text-slate-400  tracking-widest">
+                                        {fu.completed_at
+                                          ? new Date(fu.completed_at).toLocaleDateString([], {
+                                              month: "short",
+                                              day: "numeric",
+                                              year: "numeric",
+                                            })
+                                          : fu.dueDate
+                                            ? new Date(fu.dueDate).toLocaleDateString([], {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                              })
+                                            : ""}
+                                        {fu.completed_at && " · " + new Date(fu.completed_at).toLocaleTimeString([], {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          hour12: true,
+                                        })}
+                                      </span>
+                                      <span className="text-[8px] font-bold  tracking-widest px-2 py-0.5 rounded-md bg-success/10 text-success">
+                                        Follow-Up Completed
+                                      </span>
+                                    </div>
+                                    <p className="text-[11px] font-bold text-primary tracking-tight mb-1">
+                                      {fu.title}
+                                    </p>
+                                    <p className="text-[12px] font-medium text-primary/80 leading-relaxed">
+                                      {fu.follow_brief}
+                                    </p>
+                                    {(fu.completed_by || fu.completed_at) && (
+                                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-2">
+                                        {fu.completed_by && (
+                                          <p className="text-[9px] font-bold text-slate-400 tracking-widest">
+                                            Completed by: {fu.completed_by}
+                                          </p>
+                                        )}
+                                        {fu.completed_at && (
+                                          <p className="text-[9px] font-bold text-slate-400 tracking-widest">
+                                            Completed At: {new Date(fu.completed_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}{" · "}{new Date(fu.completed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}
+                                          </p>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            ))
+                              ))}
+                              {clientActivities.map((conv) => (
+                                <div key={conv.id} className="ml-6 relative">
+                                  <div
+                                    className={`absolute -left-[33px] w-6 h-6 rounded-lg flex items-center justify-center text-white shadow-sm z-10 ${conv.type === "email"
+                                      ? "bg-info"
+                                      : conv.type === "call"
+                                        ? "bg-success"
+                                        : conv.type === "meeting"
+                                          ? "bg-secondary"
+                                          : "bg-slate-400"
+                                      }`}
+                                  >
+                                    {conv.type === "call" ? (
+                                      <Phone size={11} strokeWidth={2.5} />
+                                    ) : conv.type === "meeting" ? (
+                                      <Calendar size={11} strokeWidth={2.5} />
+                                    ) : (
+                                      <Mail size={11} strokeWidth={2.5} />
+                                    )}
+                                  </div>
+                                  <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                      <span className="text-[9px] font-bold text-slate-400  tracking-widest">
+                                        {new Date(conv.date).toLocaleDateString(
+                                          [],
+                                          {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                          },
+                                        )}
+                                      </span>
+                                      <span
+                                        className={`text-[8px] font-bold  tracking-widest px-2 py-0.5 rounded-md ${conv.type === "call"
+                                          ? "bg-success/10 text-success"
+                                          : conv.type === "meeting"
+                                            ? "bg-secondary/10 text-secondary"
+                                            : "bg-info/10 text-info"
+                                          }`}
+                                      >
+                                        {conv.type}
+                                      </span>
+                                    </div>
+                                    <p className="text-[12px] font-medium text-primary leading-relaxed">
+                                      {conv.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </>
                           )}
                         </div>
                       </div>

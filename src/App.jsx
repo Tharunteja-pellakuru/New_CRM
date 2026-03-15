@@ -30,11 +30,11 @@ import {
 import { BASE_URL } from "./constants/config";
 
 // Simple wrapper for client detail pages
-function ClientDetailWrapper({ clients, type, activities, onUpdateClient, onAddActivity, onSelectProject }) {
+function ClientDetailWrapper({ clients, type, activities, followUps, onUpdateClient, onAddActivity, onSelectProject }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const client = clients.find((c) => c.id === id);
+  const client = clients.find((c) => c.id == id);
 
   if (!client) return <Navigate to={`/${type}`} replace />;
 
@@ -45,6 +45,7 @@ function ClientDetailWrapper({ clients, type, activities, onUpdateClient, onAddA
       onUpdateClient={onUpdateClient}
       onAddActivity={onAddActivity}
       activities={activities}
+      followUps={followUps}
       initialTab={location.state?.tab || "overview"}
       onSelectProject={onSelectProject}
     />
@@ -55,7 +56,7 @@ function ClientDetailWrapper({ clients, type, activities, onUpdateClient, onAddA
 function ProjectOverviewWrapper({ projects, clients, followUps, onUpdateProject }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const project = projects.find((p) => p.id === id);
+  const project = projects.find((p) => p.id == id);
 
   if (!project) return <Navigate to="/projects" replace />;
 
@@ -92,7 +93,11 @@ function AppRoutes() {
 
   // Fetch AI models on mount
   useEffect(() => {
-    fetch(`${BASE_URL}/api/ai-models`)
+    if (!isLoggedIn) return;
+
+    fetch(`${BASE_URL}/api/ai-models`, {
+      headers: getAuthHeaders(),
+    })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => {
         setAiModels(data.map((m) => ({
@@ -104,10 +109,17 @@ function AppRoutes() {
         })));
       })
       .catch(() => console.log("Failed to fetch AI models"));
-  }, []);
+  }, [isLoggedIn]);
 
   // Fetch leads from API on mount
   useEffect(() => {
+    if (!isLoggedIn) {
+      setLeads([]);
+      setLeadsLoading(false);
+      return;
+    }
+
+    setLeadsLoading(true);
     fetch(`${BASE_URL}/api/get-leads`, {
       headers: getAuthHeaders(),
     })
@@ -120,22 +132,24 @@ function AppRoutes() {
         return res.ok ? res.json() : [];
       })
       .then((data) => {
+        if (!data) return;
+        
         // Extract leads array from response
         const leadsArray = Array.isArray(data) ? data : data.leads || [];
         
         // Transform API data to match component expected format
-        // Only include fields that exist in the database schema
         const transformedLeads = leadsArray.map((lead) => ({
           id: lead.id?.toString() || lead.uuid,
           name: lead.full_name || "Unknown",
           company: lead.website_url?.replace(/^https?:\/\//, "").split("/")[0] || "Independent",
           email: lead.email || "",
           phone: lead.phone_number || "",
-          status: lead.lead_status === "Dismissed" ? "Dismissed" : "Lead",  // ← Use actual status from DB
+          status: lead.lead_status === "Dismissed" ? "Dismissed" : "Lead",
           leadType: lead.lead_status || "Warm",
           projectCategory: lead.lead_category || "Tech",
           industry: lead.lead_category || "Tech",
           website: lead.website_url || "",
+          country: lead.country || "",
           notes: lead.message || "",
           joinedDate: lead.created_at ? lead.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
           lastContact: lead.updated_at ? lead.updated_at.split("T")[0] : new Date().toISOString().split("T")[0],
@@ -143,6 +157,13 @@ function AppRoutes() {
         }));
         
         setLeads(transformedLeads);
+        
+        // Also update clients state with real leads, keeping non-lead clients
+        setClients(prev => {
+          const nonLeads = prev.filter(c => c.status !== "Lead" && c.status !== "Dismissed");
+          return [...nonLeads, ...transformedLeads];
+        });
+        
         setLeadsLoading(false);
       })
       .catch(() => {
@@ -150,7 +171,24 @@ function AppRoutes() {
         setLeads([]);
         setLeadsLoading(false);
       });
-  }, []);
+  }, [isLoggedIn]);
+
+  // Fetch followups on mount
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setFollowUps([]);
+      return;
+    }
+
+    fetch(`${BASE_URL}/api/get-followups`, {
+      headers: getAuthHeaders(),
+    })
+      .then((res) => res.ok ? res.json() : [])
+      .then((data) => {
+        setFollowUps(data);
+      })
+      .catch(() => console.log("Failed to fetch followups"));
+  }, [isLoggedIn]);
 
   // Simple handlers
   function handleLogin(data) {
@@ -168,7 +206,8 @@ function AppRoutes() {
   }
 
   function handleClientSelect(client, tab = "overview") {
-    const route = client.status === "Lead" ? "leads" : "clients";
+    // Both active leads and dismissed leads should use the "leads" route
+    const route = (client.status === "Lead" || client.status === "Dismissed") ? "leads" : "clients";
     navigate(`/${route}/${client.id}`, { state: { tab } });
   }
 
@@ -179,7 +218,7 @@ function AppRoutes() {
   async function handleDeleteLead(id) {
     try {
       // Find the lead to get its ID
-      const leadToDelete = leads.find((l) => l.id === id);
+      const leadToDelete = leads.find((l) => l.id == id);
       if (!leadToDelete) return;
 
       console.log("Deleting lead:", id);
@@ -197,10 +236,10 @@ function AppRoutes() {
         console.log("Lead deleted successfully:", result);
         
         // Remove from local state after successful API call
-        setLeads((prev) => prev.filter((l) => l.id !== id));
+        setLeads((prev) => prev.filter((l) => l.id != id));
         
         // Also update clients array to keep them in sync
-        setClients((prev) => prev.filter((c) => c.id !== id));
+        setClients((prev) => prev.filter((c) => c.id != id));
       } else {
         const errorData = await res.json();
         console.error("Failed to delete lead:", errorData);
@@ -212,38 +251,88 @@ function AppRoutes() {
     }
   }
 
-  function handleAddClient(data) {
-    const newClient = {
-      id: `c-${Date.now()}`,
-      ...data,
-      avatar: `https://picsum.photos/100/100?random=${clients.length + 10}`,
-      joinedDate: data.onboardingDate || new Date().toISOString().split("T")[0],
-      lastContact: new Date().toISOString().split("T")[0],
-      industry: data.projectCategory || data.industry || "Unknown",
-      company: data.projectName || data.company || "Independent",
-      notes: data.status === "Lead" 
-        ? data.notes 
-        : `${data.notes || ""}\n\n[Project] ${data.projectName} | ${data.projectStatus}`,
-    };
-    setClients([newClient, ...clients]);
+  async function handleAddClient(data) {
+    if (data.status === "Lead") {
+      try {
+        const payload = {
+          full_name: data.name,
+          phone_number: data.phone,
+          email: data.email,
+          lead_status: data.leadType || "Warm",
+          message: data.notes || "",
+          website_url: data.website || data.company || "",
+          country: data.country || "",
+          lead_category: data.projectCategory || data.industry || "Tech",
+        };
+
+        const res = await fetch(`${BASE_URL}/api/add-lead`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          const newLead = {
+            id: result.lead?.id?.toString() || result.lead?.uuid || `new-${Date.now()}`,
+            name: result.lead?.full_name || data.name,
+            company: result.lead?.website_url?.replace(/^https?:\/\//, "").split("/")[0] || data.company || "Independent",
+            email: result.lead?.email || data.email,
+            phone: result.lead?.phone_number || data.phone,
+            status: "Lead",
+            leadType: result.lead?.lead_status || data.leadType || "Warm",
+            projectCategory: result.lead?.lead_category || data.projectCategory || "Tech",
+            industry: result.lead?.lead_category || data.industry || "Tech",
+            country: result.lead?.country !== undefined ? result.lead.country : (data.country || ""),
+            website: result.lead?.website_url || data.website || "",
+            notes: result.lead?.message || data.notes || "",
+            joinedDate: result.lead?.created_at ? result.lead.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
+            lastContact: result.lead?.updated_at ? result.lead.updated_at.split("T")[0] : new Date().toISOString().split("T")[0],
+            avatar: `https://picsum.photos/100/100?random=${result.lead?.id || Date.now() % 100}`,
+          };
+          
+          setLeads([newLead, ...leads]);
+          setClients([newLead, ...clients]);
+        } else {
+          console.error("Failed to add lead:", await res.json());
+          alert("Failed to add lead. Please try again.");
+        }
+      } catch (err) {
+        console.error("Error adding lead:", err);
+        alert("An error occurred while adding lead.");
+      }
+    } else {
+      const newClient = {
+        id: `c-${Date.now()}`,
+        ...data,
+        avatar: `https://picsum.photos/100/100?random=${clients.length + 10}`,
+        joinedDate: data.onboardingDate || new Date().toISOString().split("T")[0],
+        lastContact: new Date().toISOString().split("T")[0],
+        industry: data.projectCategory || data.industry || "Unknown",
+        company: data.projectName || data.company || "Independent",
+        notes: `${data.notes || ""}\n\n[Project] ${data.projectName} | ${data.projectStatus}`,
+      };
+      
+      setClients([newClient, ...clients]);
+    }
   }
 
   function handleOnboardClient(id, data) {
     setClients((prev) => prev.map((c) => 
-      c.id === id 
+      c.id == id 
         ? { ...c, ...data, status: data.status, isConverted: true }
         : c
     ));
   }
 
   function handleUpdateClient(updated) {
-    setClients((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    setClients((prev) => prev.map((c) => (c.id == updated.id ? updated : c)));
   }
 
   async function handleDismissLead(id) {
     try {
       // Find the lead to update
-      const leadToUpdate = leads.find((l) => l.id === id);
+      const leadToUpdate = leads.find((l) => l.id == id);
       if (!leadToUpdate) return;
 
       console.log("Dismissing lead:", id);
@@ -286,10 +375,10 @@ function AppRoutes() {
         console.log("Transformed dismissed lead:", dismissedLead);
         
         // Update local state after successful API call with complete data
-        setLeads((prev) => prev.map((l) => (l.id === id ? dismissedLead : l)));
+        setLeads((prev) => prev.map((l) => (l.id == id ? dismissedLead : l)));
         
         // Also update clients array to keep them in sync
-        setClients((prev) => prev.map((c) => (c.id === id ? dismissedLead : c)));
+        setClients((prev) => prev.map((c) => (c.id == id ? dismissedLead : c)));
       } else {
         const errorData = await res.json();
         console.error("Failed to dismiss lead:", errorData);
@@ -304,7 +393,7 @@ function AppRoutes() {
   async function handleRestoreLead(id) {
     try {
       // Find the lead to update
-      const leadToUpdate = leads.find((l) => l.id === id);
+      const leadToUpdate = leads.find((l) => l.id == id);
       if (!leadToUpdate) return;
 
       console.log("Restoring lead:", id);
@@ -313,9 +402,7 @@ function AppRoutes() {
       // Send all required fields to preserve lead data
       const res = await fetch(`${BASE_URL}/api/update-lead/${id}`, {
         method: "PUT",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           full_name: leadToUpdate.name,
           phone_number: leadToUpdate.phone,
@@ -334,10 +421,10 @@ function AppRoutes() {
         console.log("Lead restored successfully:", result);
         
         // Update local state after successful API call
-        setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status: "Lead", leadType: "Warm", isConverted: false } : l)));
+        setLeads((prev) => prev.map((l) => (l.id == id ? { ...l, status: "Lead", leadType: "Warm", isConverted: false } : l)));
         
         // Also update clients array to keep them in sync
-        setClients((prev) => prev.map((c) => (c.id === id ? { ...c, status: "Lead", leadType: "Warm", isConverted: false } : c)));
+        setClients((prev) => prev.map((c) => (c.id == id ? { ...c, status: "Lead", leadType: "Warm", isConverted: false } : c)));
       } else {
         const errorData = await res.json();
         console.error("Failed to restore lead:", errorData);
@@ -352,7 +439,7 @@ function AppRoutes() {
   async function handleEditLead(id, editData) {
     try {
       // Find the lead to get current data
-      const leadToUpdate = leads.find((l) => l.id === id);
+      const leadToUpdate = leads.find((l) => l.id == id);
       if (!leadToUpdate) {
         console.error("Lead not found:", id);
         throw new Error("Lead not found");
@@ -371,6 +458,7 @@ function AppRoutes() {
         email: editData.email !== undefined && editData.email !== null ? editData.email : leadToUpdate.email,
         lead_status: editData.leadType !== undefined && editData.leadType !== null ? editData.leadType : leadToUpdate.leadType,
         website_url: editData.website !== undefined && editData.website !== null ? editData.website : (leadToUpdate.website || ""),
+        country: editData.country !== undefined && editData.country !== null ? editData.country : (leadToUpdate.country || ""),
         message: editData.notes !== undefined && editData.notes !== null ? editData.notes : leadToUpdate.notes,
         lead_category: editData.projectCategory !== undefined && editData.projectCategory !== null ? editData.projectCategory : (leadToUpdate.projectCategory || "Tech"),
       };
@@ -407,6 +495,7 @@ function AppRoutes() {
         leadType: updatedLead.lead?.lead_status || editData.leadType,
         projectCategory: updatedLead.lead?.lead_category || editData.projectCategory,
         industry: updatedLead.lead?.lead_category || editData.projectCategory,
+        country: updatedLead.lead?.country !== undefined ? updatedLead.lead.country : (editData.country !== undefined ? editData.country : leadToUpdate.country || ""),
         website: updatedLead.lead?.website_url !== undefined ? updatedLead.lead.website_url : editData.website,
         notes: updatedLead.lead?.message || editData.notes,
         joinedDate: updatedLead.lead?.created_at ? updatedLead.lead.created_at.split("T")[0] : leadToUpdate.joinedDate,
@@ -418,10 +507,10 @@ function AppRoutes() {
       console.log("=== END DEBUG ===");
 
       // Update local state after successful API call
-      setLeads((prev) => prev.map((l) => (l.id === id ? transformedLead : l)));
+      setLeads((prev) => prev.map((l) => (l.id == id ? transformedLead : l)));
       
       // Also update clients array if this lead exists there
-      setClients((prev) => prev.map((c) => (c.id === id ? transformedLead : c)));
+      setClients((prev) => prev.map((c) => (c.id == id ? transformedLead : c)));
       
       console.log("✅ Lead updated successfully in both leads and clients arrays!");
       
@@ -437,29 +526,95 @@ function AppRoutes() {
   }
 
   function handleUpdateProject(updated) {
-    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setProjects((prev) => prev.map((p) => (p.id == updated.id ? updated : p)));
   }
 
   function handleAddActivity(data) {
     setActivities([{ id: `a-${Date.now()}`, ...data }, ...activities]);
   }
 
-  function handleAddFollowUp(data) {
-    setFollowUps([{ id: `f-${Date.now()}`, status: "pending", ...data }, ...followUps]);
+  async function handleAddFollowUp(data) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/add-followup`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        const newFollowup = {
+          ...result.followup,
+          id: result.followup.id,
+          status: result.followup.followup_status?.toLowerCase() || "pending",
+          dueDate: result.followup.followup_date,
+        };
+        setFollowUps((prev) => [...prev, newFollowup]);
+      } else {
+        console.error("Failed to add follow-up:", await res.json());
+      }
+    } catch (err) {
+      console.error("Error adding follow-up:", err);
+    }
   }
 
-  function handleEditFollowUp(updated) {
-    setFollowUps((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+  async function handleEditFollowUp(updated) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/update-followup/${updated.id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updated),
+      });
+
+      if (res.ok) {
+        setFollowUps((prev) => prev.map((f) => (f.id == updated.id ? updated : f)));
+      } else {
+        console.error("Failed to update follow-up:", await res.json());
+      }
+    } catch (err) {
+      console.error("Error updating follow-up:", err);
+    }
   }
 
-  function handleDeleteFollowUp(id) {
-    setFollowUps((prev) => prev.filter((f) => f.id !== id));
+  async function handleDeleteFollowUp(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/delete-followup/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+
+      if (res.ok) {
+        setFollowUps((prev) => prev.filter((f) => f.id != id));
+      } else {
+        console.error("Failed to delete follow-up:", await res.json());
+      }
+    } catch (err) {
+      console.error("Error deleting follow-up:", err);
+    }
   }
 
-  function handleToggleFollowUpStatus(id) {
-    setFollowUps((prev) => prev.map((f) => 
-      f.id === id ? { ...f, status: f.status === "completed" ? "pending" : "completed" } : f
-    ));
+  async function handleToggleFollowUpStatus(id, brief = "", completed_at = "", completed_by = "") {
+    try {
+      const followUp = followUps.find(f => f.id == id);
+      if (!followUp) return;
+
+      const nextStatus = followUp.status === "completed" ? "pending" : "completed";
+      const res = await fetch(`${BASE_URL}/api/toggle-followup-status/${id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: nextStatus, brief, completed_at, completed_by }),
+      });
+
+      if (res.ok) {
+        setFollowUps((prev) => prev.map((f) => 
+          f.id == id ? { ...f, status: nextStatus, follow_brief: brief } : f
+        ));
+      } else {
+        console.error("Failed to toggle follow-up status:", await res.json());
+      }
+    } catch (err) {
+      console.error("Error toggling follow-up status:", err);
+    }
   }
 
   // Enquiry handlers
@@ -480,12 +635,12 @@ function AppRoutes() {
       website: enquiry.website,
     };
     setClients([newClient, ...clients]);
-    setEnquiries((prev) => prev.filter((e) => e.id !== enquiry.id));
+    setEnquiries((prev) => prev.filter((e) => e.id != enquiry.id));
     navigate("/leads");
   }
 
   function handleUpdateEnquiry(updated) {
-    setEnquiries((prev) => prev.map((e) => (e.id === updated.id ? { ...e, ...updated } : e)));
+    setEnquiries((prev) => prev.map((e) => (e.id == updated.id ? { ...e, ...updated } : e)));
   }
 
   function handleAddEnquiry(data) {
@@ -521,7 +676,7 @@ function AppRoutes() {
         body: JSON.stringify(updated),
       });
       if (res.ok) {
-        setAiModels(aiModels.map((m) => (m.id === updated.id ? updated : m)));
+        setAiModels(aiModels.map((m) => (m.id == updated.id ? updated : m)));
       }
     } catch (e) {
       console.log("Failed to update AI model");
@@ -531,7 +686,7 @@ function AppRoutes() {
   async function handleDeleteAiModel(id) {
     try {
       const res = await fetch(`${BASE_URL}/api/ai-models/${id}`, { method: "DELETE" });
-      if (res.ok) setAiModels(aiModels.filter((m) => m.id !== id));
+      if (res.ok) setAiModels(aiModels.filter((m) => m.id != id));
     } catch (e) {
       console.log("Failed to delete AI model");
     }
@@ -567,7 +722,9 @@ function AppRoutes() {
             <Dashboard
               followUps={followUps}
               clients={clients}
+              leads={leads}
               enquiries={enquiries}
+              aiModels={aiModels}
               onSelectFollowUp={handleClientSelect}
               onViewAllFollowUps={() => navigate("/followups")}
               onNavigate={(tab) => navigate(`/${tab}`)}
@@ -583,10 +740,10 @@ function AppRoutes() {
               enquiries={enquiries}
               aiModels={aiModels}
               onPromote={handlePromoteEnquiry}
-              onDismiss={(id) => setEnquiries((prev) => prev.map((e) => e.id === id ? { ...e, status: "dismissed" } : e))}
-              onHold={(id) => setEnquiries((prev) => prev.map((e) => e.id === id ? { ...e, status: "hold" } : e))}
-              onRestore={(id) => setEnquiries((prev) => prev.map((e) => e.id === id ? { ...e, status: "new" } : e))}
-              onDelete={(id) => setEnquiries((prev) => prev.filter((e) => e.id !== id))}
+              onDismiss={(id) => setEnquiries((prev) => prev.map((e) => e.id == id ? { ...e, status: "dismissed" } : e))}
+              onHold={(id) => setEnquiries((prev) => prev.map((e) => e.id == id ? { ...e, status: "hold" } : e))}
+              onRestore={(id) => setEnquiries((prev) => prev.map((e) => e.id == id ? { ...e, status: "new" } : e))}
+              onDelete={(id) => setEnquiries((prev) => prev.filter((e) => e.id != id))}
               onDeleteAll={() => setEnquiries((prev) => prev.filter((e) => e.status !== "dismissed"))}
               onUpdate={handleUpdateEnquiry}
               onAdd={handleAddEnquiry}
@@ -677,6 +834,7 @@ function AppRoutes() {
               clients={leads}
               type="leads"
               activities={activities}
+              followUps={followUps}
               onUpdateClient={handleEditLead}
               onAddActivity={handleAddActivity}
               onSelectProject={handleProjectSelect}

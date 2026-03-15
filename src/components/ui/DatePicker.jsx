@@ -28,7 +28,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
         top: positionAbove ? `${rect.top - dropdownHeight - 8}px` : `${rect.bottom + 8}px`,
         left: `${rect.left}px`,
         width: `${Math.max(rect.width, 240)}px`,
-        zIndex: 9999
+        zIndex: 999999
       });
     }
   }, [isOpen]);
@@ -258,11 +258,11 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
       {isOpen && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[999998]"
             onClick={() => setIsOpen(false)}
           />
           <div 
-            className="datepicker-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl z-[9999] overflow-hidden animate-fade-in-up origin-top p-3"
+            className="datepicker-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl z-[999999] overflow-hidden animate-fade-in-up origin-top p-3"
             style={dropdownStyle}
           >
             <div className="flex items-center justify-between mb-3 px-1">

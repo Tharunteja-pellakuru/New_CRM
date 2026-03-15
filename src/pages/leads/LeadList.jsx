@@ -27,8 +27,10 @@ import {
   Clock,
   Calendar,
   Zap,
+  Check,
 } from "lucide-react";
 import DatePicker from "../../components/ui/DatePicker";
+import { countries } from "../../utils/countries";
 
 const LeadList = ({
   leads,
@@ -50,11 +52,15 @@ const LeadList = ({
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [isTierDropdownOpen, setIsTierDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countrySearchTerm, setCountrySearchTerm] = useState("");
 
   const tierButtonRef = useRef(null);
   const categoryButtonRef = useRef(null);
+  const countryButtonRef = useRef(null);
   const [tierDropdownStyle, setTierDropdownStyle] = useState({});
   const [categoryDropdownStyle, setCategoryDropdownStyle] = useState({});
+  const [countryDropdownStyle, setCountryDropdownStyle] = useState({});
 
   useEffect(() => {
     if (isTierDropdownOpen && tierButtonRef.current) {
@@ -83,21 +89,36 @@ const LeadList = ({
   }, [isCategoryDropdownOpen]);
 
   useEffect(() => {
+    if (isCountryDropdownOpen && countryButtonRef.current) {
+      const rect = countryButtonRef.current.getBoundingClientRect();
+      setCountryDropdownStyle({
+        position: "fixed",
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        zIndex: 9999,
+      });
+    }
+  }, [isCountryDropdownOpen]);
+
+  useEffect(() => {
     const handleScrollResize = (e) => {
       if (isTierDropdownOpen || isCategoryDropdownOpen) {
         if (
           e.type === "scroll" &&
           e.target.closest &&
           (e.target.closest(".tier-dropdown") ||
-            e.target.closest(".category-dropdown"))
+            e.target.closest(".category-dropdown") ||
+            e.target.closest(".country-dropdown"))
         ) {
           return;
         }
         setIsTierDropdownOpen(false);
         setIsCategoryDropdownOpen(false);
+        setIsCountryDropdownOpen(false);
       }
     };
-    if (isTierDropdownOpen || isCategoryDropdownOpen) {
+    if (isTierDropdownOpen || isCategoryDropdownOpen || isCountryDropdownOpen) {
       window.addEventListener("scroll", handleScrollResize, true);
       window.addEventListener("resize", handleScrollResize, true);
     }
@@ -161,6 +182,7 @@ const LeadList = ({
     projectCategory: "Tech",
     projectPriority: "Medium",
     projectDescription: "",
+    country: "",
   });
 
   const handleOnboardSubmit = (e) => {
@@ -352,13 +374,13 @@ const LeadList = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onAddClient) {
+    if (onAddLead) {
       const submissionData = {
         ...formData,
         company: formData.company || "Independent",
         industry: formData.industry || "Unknown",
       };
-      onAddClient(submissionData);
+      onAddLead(submissionData);
       setShowAddModal(false);
       setFormData({
         name: "",
@@ -374,6 +396,7 @@ const LeadList = ({
         projectCategory: "Tech",
         projectPriority: "Medium",
         projectDescription: "",
+        country: "",
       });
     }
   };
@@ -522,7 +545,7 @@ const LeadList = ({
                       className="category-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[9999] animate-fade-in-up origin-top"
                       style={categoryDropdownStyle}
                     >
-                      {["All", "Tech", "Media"].map((cat) => (
+                      {["All", "Tech", "Social Media"].map((cat) => (
                         <button
                           key={cat}
                           onClick={() => {
@@ -630,8 +653,12 @@ const LeadList = ({
                   return (
                     <tr
                       key={lead.id}
-                      onClick={() => onSelectLead(lead)}
-                      className="group hover:bg-slate-50/50 cursor-pointer transition-all"
+                      onClick={() => lead.status !== "Dismissed" && onSelectLead(lead)}
+                      className={`group transition-all ${
+                        lead.status === "Dismissed"
+                          ? "bg-slate-50/30 opacity-80 cursor-default"
+                          : "hover:bg-slate-50/50 cursor-pointer"
+                      }`}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-6">
@@ -650,7 +677,7 @@ const LeadList = ({
                           <div className="flex items-center gap-2 text-primary">
                             <Phone size={12} className="text-secondary" />
                             <span className="text-xs font-bold whitespace-nowrap">
-                              {lead.phone || "N/A"}
+                              {lead.country ? `${lead.country} ` : ""}{lead.phone || "N/A"}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-slate-400 mt-1">
@@ -664,7 +691,7 @@ const LeadList = ({
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`w-2 h-2 rounded-full ${lead.projectCategory === "Tech" ? "bg-secondary" : lead.projectCategory === "Media" ? "bg-blue-400" : "bg-slate-300"}`}
+                            className={`w-2 h-2 rounded-full ${lead.projectCategory === "Tech" ? "bg-secondary" : lead.projectCategory === "Social Media" ? "bg-blue-400" : "bg-slate-300"}`}
                           />
                           <span className="text-sm font-bold text-primary">
                             {lead.projectCategory || lead.industry || "Other"}
@@ -747,7 +774,7 @@ const LeadList = ({
                                   e.stopPropagation();
                                   onDismissLead(lead.id);
                                 }}
-                                className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-300 hover:text-amber-500 hover:border-amber-500 hover:bg-amber-50 transition-all active:scale-90 shadow-sm"
+                                className="p-2.5 bg-amber-50/50 border border-amber-200/50 rounded-lg text-amber-500/70 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 transition-all active:scale-90 shadow-sm"
                                 title="Dismiss Lead"
                               >
                                 <UserX size={18} />
@@ -811,8 +838,12 @@ const LeadList = ({
             return (
               <div
                 key={lead.id}
-                onClick={() => onSelectLead(lead)}
-                className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+                onClick={() => lead.status !== "Dismissed" && onSelectLead(lead)}
+                className={`bg-white p-4 rounded-2xl border transition-all ${
+                  lead.status === "Dismissed"
+                    ? "border-slate-100 opacity-80 shadow-none cursor-default"
+                    : "border-slate-200 shadow-sm hover:shadow-md active:scale-[0.98] cursor-pointer"
+                }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -825,7 +856,7 @@ const LeadList = ({
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <div
-                          className={`w-1.5 h-1.5 rounded-full ${lead.projectCategory === "Tech" ? "bg-secondary" : lead.projectCategory === "Media" ? "bg-blue-400" : "bg-slate-300"}`}
+                          className={`w-1.5 h-1.5 rounded-full ${lead.projectCategory === "Tech" ? "bg-secondary" : lead.projectCategory === "Social Media" ? "bg-blue-400" : "bg-slate-300"}`}
                         />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                           {lead.projectCategory || lead.industry || "Other"}
@@ -854,8 +885,8 @@ const LeadList = ({
                         <div className="w-7 h-7 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
                           <Phone size={14} />
                         </div>
-                        <span className="text-xs font-bold whitespace-nowrap">
-                          {lead.phone || "N/A"}
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {lead.country ? `${lead.country} ` : ""}{lead.phone}
                         </span>
                       </div>
                       <div className="flex items-center gap-2.5 text-slate-500">
@@ -989,16 +1020,16 @@ const LeadList = ({
               className="p-4 md:p-5 space-y-4 max-h-[65vh] overflow-y-auto"
             >
               {title === "Leads" ? (
-                /* ADD LEAD FIELDS */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* ADD LEAD FIELDS */}
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      CLIENT NAME
+                      LEAD NAME
                     </label>
                     <input
                       required
                       type="text"
-                      placeholder="Anand Kumar"
+                      placeholder="e.g. Rahul Sharma"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={formData.name}
                       onChange={(e) =>
@@ -1014,13 +1045,104 @@ const LeadList = ({
                     <input
                       required
                       type="email"
-                      placeholder="anand.kumar@fintech.in"
+                      placeholder="rahul.sharma@example.com"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
                     />
+                  </div>
+
+                  <div className="space-y-1.5 relative">
+                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      COUNTRY CODE
+                    </label>
+                    <button
+                      type="button"
+                      ref={countryButtonRef}
+                      onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium transition-all"
+                    >
+                      <span className={formData.country ? "text-[#18254D]" : "text-slate-400"}>
+                        {formData.country
+                          ? countries.find((c) => c.code === formData.country)?.name + " (" + formData.country + ")"
+                          : "Select Country Code"}
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className={`text-slate-400 transition-transform duration-300 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {isCountryDropdownOpen &&
+                      createPortal(
+                        <>
+                          <div
+                            className="fixed inset-0 z-[9998]"
+                            onClick={() => setIsCountryDropdownOpen(false)}
+                          />
+                          <div
+                            className="country-dropdown bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-[9999] animate-fade-in flex flex-col"
+                            style={countryDropdownStyle}
+                          >
+                            <div className="p-2 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
+                              <Search size={14} className="text-slate-400 ml-1" />
+                              <input
+                                autoFocus
+                                type="text"
+                                placeholder="Search country or code..."
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium p-1"
+                                value={countrySearchTerm}
+                                onChange={(e) => setCountrySearchTerm(e.target.value)}
+                              />
+                              {countrySearchTerm && (
+                                <button
+                                  onClick={() => setCountrySearchTerm("")}
+                                  className="p-1 hover:bg-slate-100 rounded-lg text-slate-400"
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </div>
+                            <div className="max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar py-1">
+                              {countries
+                                .filter(
+                                  (c) =>
+                                    c.name.toLowerCase().includes(countrySearchTerm.toLowerCase()) ||
+                                    c.code.includes(countrySearchTerm)
+                                )
+                                .map((c) => (
+                                  <button
+                                    key={c.name + c.code}
+                                    type="button"
+                                    onClick={() => {
+                                      setFormData({ ...formData, country: c.code });
+                                      setIsCountryDropdownOpen(false);
+                                      setCountrySearchTerm("");
+                                    }}
+                                    className={`w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors text-left ${
+                                      formData.country === c.code ? "bg-secondary/5" : ""
+                                    }`}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-bold text-[#18254D]">
+                                        {c.name}
+                                      </span>
+                                      <span className="text-[10px] text-slate-400 font-bold tracking-widest">
+                                        {c.code}
+                                      </span>
+                                    </div>
+                                    {formData.country === c.code && (
+                                      <Check size={16} className="text-secondary" />
+                                    )}
+                                  </button>
+                                ))}
+                            </div>
+                          </div>
+                        </>,
+                        document.body
+                      )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -1030,7 +1152,7 @@ const LeadList = ({
                     <input
                       required
                       type="tel"
-                      placeholder="+91 98765 43210"
+                      placeholder="e.g. +91 98765 43210"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={formData.phone}
                       onChange={(e) =>
@@ -1039,13 +1161,13 @@ const LeadList = ({
                     />
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 md:col-span-2">
                     <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
                       WEBSITE URL
                     </label>
                     <input
-                      type="url"
-                      placeholder="https://www.company.com"
+                      type="text"
+                      placeholder="e.g. www.company.com"
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                       value={formData.website}
                       onChange={(e) =>
@@ -1059,7 +1181,7 @@ const LeadList = ({
                       LEAD CATEGORY
                     </label>
                     <div className="flex gap-2">
-                      {["Tech", "Media"].map((cat) => (
+                      {["Tech", "Social Media"].map((cat) => (
                         <button
                           key={cat}
                           type="button"
@@ -1124,7 +1246,7 @@ const LeadList = ({
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="Add any additional context..."
+                      placeholder="e.g. Interested in cloud migration services..."
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium resize-none shadow-sm"
                       value={formData.notes || formData.industry}
                       onChange={(e) =>
@@ -1189,7 +1311,7 @@ const LeadList = ({
                       <input
                         required
                         type="text"
-                        placeholder="Anand Kumar"
+                        placeholder="e.g. Vikram Malhotra"
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                         value={formData.name}
                         onChange={(e) =>
@@ -1205,7 +1327,7 @@ const LeadList = ({
                       <input
                         required
                         type="email"
-                        placeholder="anand.kumar@fintech.in"
+                        placeholder="vikram@enterprise.in"
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                         value={formData.email}
                         onChange={(e) =>
@@ -1222,7 +1344,7 @@ const LeadList = ({
                       <input
                         required
                         type="tel"
-                        placeholder="+91 98765 43210"
+                        placeholder="e.g. +44 20 7946 0958"
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                         value={formData.phone}
                         onChange={(e) =>
@@ -1250,7 +1372,7 @@ const LeadList = ({
                       <input
                         required
                         type="text"
-                        placeholder="e.g. Website Redesign"
+                        placeholder="e.g. Mobile App Development"
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
                         value={formData.projectName}
                         onChange={(e) =>
@@ -1329,7 +1451,7 @@ const LeadList = ({
                         LEAD CATEGORY
                       </label>
                       <div className="flex gap-2">
-                        {["Tech", "Media"].map((cat) => (
+                        {["Tech", "Social Media"].map((cat) => (
                           <button
                             key={cat}
                             type="button"
@@ -1414,7 +1536,7 @@ const LeadList = ({
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="Brief overview of the project scope..."
+                        placeholder="e.g. Design and develop a cross-platform mobile app for e-commerce..."
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-bold resize-none shadow-sm"
                         value={formData.projectDescription}
                         onChange={(e) =>
@@ -1437,7 +1559,7 @@ const LeadList = ({
                         </div>
                         <input
                           type="number"
-                          placeholder="e.g. 50000"
+                          placeholder="e.g. 2,50,000"
                           className="w-full pl-8 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium shadow-sm"
                           value={formData.budget || ""}
                           onChange={(e) =>
@@ -1510,7 +1632,7 @@ const LeadList = ({
                             className={`text-sm font-bold ${formData.scopeDocument ? "text-[#18254D]" : "text-slate-400"}`}
                           >
                             {formData.scopeDocument ||
-                              "Click to upload scope document (PDF, DOCX)"}
+                              "Upload project requirements (PDF/DOCX)"}
                           </span>
                         </div>
                       </div>
@@ -1852,7 +1974,7 @@ const LeadList = ({
                     PROJECT CATEGORY
                   </label>
                   <div className="flex gap-2">
-                    {["Tech", "Media"].map((cat) => (
+                    {["Tech", "Social Media"].map((cat) => (
                       <button
                         key={cat}
                         type="button"
@@ -2011,7 +2133,7 @@ const LeadList = ({
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Add any additional context..."
+                    placeholder="e.g. Focus on UI/UX redesign and performance optimization..."
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium resize-none shadow-sm"
                     value={onboardingData.projectDescription}
                     onChange={(e) =>
@@ -2102,7 +2224,7 @@ const LeadList = ({
                         className={`text-sm font-bold ${onboardingData.scopeDocument ? "text-[#18254D]" : "text-slate-400"}`}
                       >
                         {onboardingData.scopeDocument ||
-                          "Click to upload scope document (PDF, DOCX)"}
+                          "Upload scope document"}
                       </span>
                     </div>
                   </div>
@@ -2249,7 +2371,7 @@ const LeadList = ({
                 </label>
                 <textarea
                   required
-                  placeholder="Write your follow-up notes..."
+                  placeholder="e.g. Discussed budget constraints and finalized timeline..."
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:outline-none text-sm font-medium min-h-[100px] resize-none"
                   value={followUpData.description}
                   onChange={(e) =>
@@ -2274,7 +2396,7 @@ const LeadList = ({
           </div>
         </div>
       )}
-    </div>
+      </div>
   );
 };
 

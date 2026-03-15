@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Area, Line, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Inbox, CheckCircle2, Clock, Activity, UserPlus, Bell, ChevronRight, ChevronDown, X, Info } from "lucide-react";
+import { Inbox, CheckCircle2, Clock, Activity, UserPlus, Bell, ChevronRight, ChevronDown, X, Info, Users } from "lucide-react";
 import { ANALYTICS_DATA } from "../../constants/mockData";
 
 // Simple stat card component
@@ -32,7 +32,7 @@ function StatCard({ title, value, trend, trendUp, icon, description }) {
   );
 }
 
-function Dashboard({ followUps, clients, enquiries, onSelectFollowUp, onNavigate, onClearNotifications }) {
+function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], onSelectFollowUp, onNavigate, onClearNotifications }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedYear, setSelectedYear] = useState("2024");
   const [selectedMonth, setSelectedMonth] = useState("All");
@@ -70,7 +70,7 @@ function Dashboard({ followUps, clients, enquiries, onSelectFollowUp, onNavigate
   const totalNotifications = newEnquiries.length;
   const newEnquiriesCount = newEnquiries.length;
   
-  const leadCount = clients.filter((c) => c.status === "Lead").length;
+  const leadCount = leads.filter((l) => l.status === "Lead").length;
   const clientCount = clients.filter((c) => c.status === "Active").length;
   const totalPool = leadCount + clientCount;
   const engagementRate = totalPool > 0 ? Math.round((clientCount / totalPool) * 100) : 0;

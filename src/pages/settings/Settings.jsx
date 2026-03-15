@@ -1428,7 +1428,7 @@ const Settings = ({
                         label="Privileges"
                         value={newAdmin.privileges}
                         field="add_admin_privileges"
-                        options={["Tech", "Media", "Both"]}
+                        options={["Tech", "Social Media", "Both"]}
                         onChange={(val) =>
                           setNewAdmin({ ...newAdmin, privileges: val })
                         }
@@ -1549,7 +1549,7 @@ const Settings = ({
                                     label="Privileges"
                                     value={editAdminData.privileges}
                                     field={`edit_admin_privileges_${admin.id}`}
-                                    options={["Tech", "Media", "Both"]}
+                                    options={["Tech", "Social Media", "Both"]}
                                     onChange={(val) =>
                                       setEditAdminData({
                                         ...editAdminData,
