@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { BASE_URL } from "../../constants/config";
+import { getAuthHeaders } from "../../utils/auth";
 import anandImg from "../../assets/Anand.png";
 import openaiLogo from "../../assets/openai_logo.png";
 import geminiLogo from "../../assets/gemini_logo.png";
@@ -83,6 +84,9 @@ const Settings = ({
 
       const response = await fetch(
         `${BASE_URL}/api/admin-users${excludeUuid ? `?excludeUuid=${excludeUuid}` : ""}`,
+        {
+          headers: getAuthHeaders(),
+        },
       );
 
       if (response.ok) {
@@ -269,6 +273,9 @@ const Settings = ({
         `${BASE_URL}/api/admin-users/update/${userId}`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           body: formData,
         },
       );
@@ -298,13 +305,8 @@ const Settings = ({
         // Update localStorage with new profile data
         localStorage.setItem("user", JSON.stringify(updatedProfile));
         setSelectedImageFile(null);
-        setIsProfileSaved(true);
         setIsProfileEditing(false);
-        setShowToast(true);
-        setTimeout(() => {
-          setIsProfileSaved(false);
-          setShowToast(false);
-        }, 3000);
+        showToastMessage("Profile updated successfully", "success");
       } else {
         showToastMessage(data.message || "Failed to update profile", "error");
       }
@@ -331,7 +333,7 @@ const Settings = ({
         const response = await fetch(`${BASE_URL}/api/admin-users`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            ...getAuthHeaders(),
           },
           body: JSON.stringify({
             full_name: newAdmin.name,
@@ -377,11 +379,7 @@ const Settings = ({
             privileges: "Both",
           });
           setShowAddAdminForm(false);
-          setAdminToastMessage(
-            `Admin created successfully! Default password: ${defaultPassword}`,
-          );
-          setShowAdminToast(true);
-          setTimeout(() => setShowAdminToast(false), 5000);
+          showToastMessage(`Admin created successfully! Default password: ${defaultPassword}`, "success");
           // Refresh the admin list
           fetchAdminUsers();
         } else {
@@ -406,9 +404,7 @@ const Settings = ({
         try {
           const response = await fetch(`${BASE_URL}/api/admin-users/${id}`, {
             method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: getAuthHeaders(),
           });
 
           const contentType = response.headers.get("content-type");
@@ -472,9 +468,7 @@ const Settings = ({
     try {
       const response = await fetch(`${BASE_URL}/api/admin-users/update/${id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           full_name: editAdminData.name,
           email: editAdminData.email,
@@ -559,9 +553,7 @@ const Settings = ({
           `${BASE_URL}/api/admin-users/update-password/${userId}`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify({
               currentPassword: passwordData.currentPassword,
               newPassword: passwordData.newPassword,

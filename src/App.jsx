@@ -656,7 +656,7 @@ function AppRoutes() {
     try {
       const res = await fetch(`${BASE_URL}/api/ai-models`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(model),
       });
       if (res.ok) {
@@ -672,7 +672,7 @@ function AppRoutes() {
     try {
       const res = await fetch(`${BASE_URL}/api/ai-models/${updated.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updated),
       });
       if (res.ok) {
@@ -685,7 +685,10 @@ function AppRoutes() {
 
   async function handleDeleteAiModel(id) {
     try {
-      const res = await fetch(`${BASE_URL}/api/ai-models/${id}`, { method: "DELETE" });
+      const res = await fetch(`${BASE_URL}/api/ai-models/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
       if (res.ok) setAiModels(aiModels.filter((m) => m.id != id));
     } catch (e) {
       console.log("Failed to delete AI model");
@@ -769,7 +772,6 @@ function AppRoutes() {
               onAddLead={handleAddClient}
               onAddActivity={handleAddActivity}
               allLeads={leads}
-              allClients={clients.filter((c) => c.status !== "Lead")}
             />
           }
         />

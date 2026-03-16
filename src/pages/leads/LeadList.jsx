@@ -43,8 +43,6 @@ const LeadList = ({
   onRestoreLead,
   onAddActivity,
   allLeads = [],
-  allClients = [],
-  title = "Leads",
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
@@ -173,8 +171,8 @@ const LeadList = ({
     company: "",
     email: "",
     phone: "",
-    status: title === "Leads" ? "Lead" : "Active",
-    leadType: title === "Leads" ? "Warm" : undefined,
+    status: "Lead",
+    leadType: "Warm",
     industry: "",
     notes: "",
     projectName: "",
@@ -189,13 +187,10 @@ const LeadList = ({
     e.preventDefault();
     if (onOnboardLead && onboardingLeadId) {
       onOnboardLead(onboardingLeadId, onboardingData);
-      setShowOnboardModal(false);
       setOnboardingLeadId(null);
 
       // Automatically switch to Converted view for Leads
-      if (title === "Leads") {
-        setLeadView("Converted");
-      }
+      setLeadView("Converted");
 
       setOnboardingData({
         name: "",
@@ -224,23 +219,21 @@ const LeadList = ({
     let matchesLeadType = true;
     let matchesCategory = true;
 
-    if (title === "Leads") {
-      // Sub-filter by Lead View (Pending, Converted, Dismissed)
-      if (leadView === "Pending") {
-        // Show leads that are not converted and not dismissed
-        // Hot, Warm, Cold statuses should appear here
-        if (lead.isConverted || lead.status === "Dismissed") return false;
-      } else if (leadView === "Converted") {
-        // Show only converted leads
-        if (!lead.isConverted || lead.status === "Dismissed") return false;
-      } else if (leadView === "Dismissed") {
-        // Show only dismissed leads - strict check
-        if (lead.status !== "Dismissed") return false;
-      }
-
-      matchesLeadType =
-        leadTypeFilter === "All" || lead.leadType === leadTypeFilter;
+    // Sub-filter by Lead View (Pending, Converted, Dismissed)
+    if (leadView === "Pending") {
+      // Show leads that are not converted and not dismissed
+      // Hot, Warm, Cold statuses should appear here
+      if (lead.isConverted || lead.status === "Dismissed") return false;
+    } else if (leadView === "Converted") {
+      // Show only converted leads
+      if (!lead.isConverted || lead.status === "Dismissed") return false;
+    } else if (leadView === "Dismissed") {
+      // Show only dismissed leads - strict check
+      if (lead.status !== "Dismissed") return false;
     }
+
+    matchesLeadType =
+      leadTypeFilter === "All" || lead.leadType === leadTypeFilter;
 
     // Filter by category (Tech/Media)
     if (categoryFilter !== "All") {
@@ -387,8 +380,8 @@ const LeadList = ({
         company: "",
         email: "",
         phone: "",
-        status: title === "Leads" ? "Lead" : "Active",
-        leadType: title === "Leads" ? "Warm" : undefined,
+        status: "Lead",
+        leadType: "Warm",
         industry: "",
         notes: "",
         projectName: "",
@@ -420,10 +413,10 @@ const LeadList = ({
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="max-w-2xl">
             <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-primary tracking-tight mb-2">
-              {title}
+              Leads
             </h2>
             <p className="text-xs md:text-sm text-textMuted font-medium leading-relaxed">
-              Manage your network of {title.toLowerCase()} and strategic
+              Manage your network of leads and strategic
               partnerships.
             </p>
           </div>
@@ -437,7 +430,7 @@ const LeadList = ({
                 strokeWidth={2.5}
                 className="group-hover:rotate-90 transition-transform"
               />
-              Add {title === "Leads" ? "Lead" : "Client"}
+              Add Lead
             </button>
           </div>
         </div>
@@ -453,67 +446,65 @@ const LeadList = ({
               />
               <input
                 type="text"
-                placeholder={`Search ${title.toLowerCase()}...`}
+                placeholder={`Search leads...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full h-[38px] pl-11 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-secondary/10 focus:border-secondary transition-all"
               />
             </div>
 
-            {title === "Leads" && (
-              <div className="min-w-[160px] flex-1 shrink-0 relative z-50">
-                <button
-                  ref={tierButtonRef}
-                  onClick={() => setIsTierDropdownOpen(!isTierDropdownOpen)}
-                  className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
-                >
-                  <span>
-                    {leadTypeFilter === "All"
-                      ? "All Lead Status"
-                      : leadTypeFilter}
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    strokeWidth={2.5}
-                    className={`transition-transform duration-300 ${isTierDropdownOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+            <div className="min-w-[160px] flex-1 shrink-0 relative z-50">
+              <button
+                ref={tierButtonRef}
+                onClick={() => setIsTierDropdownOpen(!isTierDropdownOpen)}
+                className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
+              >
+                <span>
+                  {leadTypeFilter === "All"
+                    ? "All Lead Status"
+                    : leadTypeFilter}
+                </span>
+                <ChevronDown
+                  size={16}
+                  strokeWidth={2.5}
+                  className={`transition-transform duration-300 ${isTierDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-                {isTierDropdownOpen &&
-                  createPortal(
-                    <>
-                      <div
-                        className="fixed inset-0 z-[9998]"
-                        onClick={() => setIsTierDropdownOpen(false)}
-                      />
-                      <div
-                        className="tier-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[9999] animate-fade-in-up origin-top"
-                        style={tierDropdownStyle}
-                      >
-                        {["All", "Hot", "Warm", "Cold"].map((tier) => (
-                          <button
-                            key={tier}
-                            onClick={() => {
-                              setLeadTypeFilter(tier);
-                              setIsTierDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-5 py-4 text-[10px] font-bold  tracking-wider transition-colors ${
-                              tier === "All"
-                                ? "bg-[#18254D] text-white"
-                                : leadTypeFilter === tier
-                                  ? "bg-slate-100 text-[#18254D]"
-                                  : "text-[#18254D] hover:bg-slate-50"
-                            }`}
-                          >
-                            {tier === "All" ? "All Tiers" : tier}
-                          </button>
-                        ))}
-                      </div>
-                    </>,
-                    document.body,
-                  )}
-              </div>
-            )}
+              {isTierDropdownOpen &&
+                createPortal(
+                  <>
+                    <div
+                      className="fixed inset-0 z-[9998]"
+                      onClick={() => setIsTierDropdownOpen(false)}
+                    />
+                    <div
+                      className="tier-dropdown bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[9999] animate-fade-in-up origin-top"
+                      style={tierDropdownStyle}
+                    >
+                      {["All", "Hot", "Warm", "Cold"].map((tier) => (
+                        <button
+                          key={tier}
+                          onClick={() => {
+                            setLeadTypeFilter(tier);
+                            setIsTierDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-5 py-4 text-[10px] font-bold  tracking-wider transition-colors ${
+                            tier === "All"
+                              ? "bg-[#18254D] text-white"
+                              : leadTypeFilter === tier
+                                ? "bg-slate-100 text-[#18254D]"
+                                : "text-[#18254D] hover:bg-slate-50"
+                          }`}
+                        >
+                          {tier === "All" ? "All Tiers" : tier}
+                        </button>
+                      ))}
+                    </div>
+                  </>,
+                  document.body,
+                )}
+            </div>
 
             {/* Category Dropdown */}
             <div className="min-w-[160px] flex-1 shrink-0 relative z-50">
@@ -584,45 +575,43 @@ const LeadList = ({
           </div>
         </div>
 
-        {/* Lead View Toggles (Leads Only) */}
-        {title === "Leads" && (
-          <div className="flex justify-center my-4 overflow-x-auto">
-            <div className="inline-flex bg-slate-100/50 p-1 rounded-2xl border border-slate-200 shadow-sm leading-none h-[42px] items-center gap-1 whitespace-nowrap">
-              {["Pending", "Converted", "Dismissed"].map((view) => {
-                const colors = {
-                  Pending: {
-                    active: "text-blue-600 border-blue-100 bg-white",
-                    hover: "hover:text-blue-500 hover:bg-white/50",
-                  },
-                  Converted: {
-                    active: "text-emerald-600 border-emerald-100 bg-white",
-                    hover: "hover:text-emerald-500 hover:bg-white/50",
-                  },
-                  Dismissed: {
-                    active: "text-rose-600 border-rose-100 bg-white",
-                    hover: "hover:text-rose-500 hover:bg-white/50",
-                  },
-                };
-                const activeColor = colors[view].active;
-                const hoverColor = colors[view].hover;
+        {/* Lead View Toggles */}
+        <div className="flex justify-center my-4 overflow-x-auto">
+          <div className="inline-flex bg-slate-100/50 p-1 rounded-2xl border border-slate-200 shadow-sm leading-none h-[42px] items-center gap-1 whitespace-nowrap">
+            {["Pending", "Converted", "Dismissed"].map((view) => {
+              const colors = {
+                Pending: {
+                  active: "text-blue-600 border-blue-100 bg-white",
+                  hover: "hover:text-blue-500 hover:bg-white/50",
+                },
+                Converted: {
+                  active: "text-emerald-600 border-emerald-100 bg-white",
+                  hover: "hover:text-emerald-500 hover:bg-white/50",
+                },
+                Dismissed: {
+                  active: "text-rose-600 border-rose-100 bg-white",
+                  hover: "hover:text-rose-500 hover:bg-white/50",
+                },
+              };
+              const activeColor = colors[view].active;
+              const hoverColor = colors[view].hover;
 
-                return (
-                  <button
-                    key={view}
-                    onClick={() => setLeadView(view)}
-                    className={`px-5 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
-                      leadView === view
-                        ? `${activeColor} shadow-md`
-                        : `text-slate-400 ${hoverColor}`
-                    }`}
-                  >
-                    {view}
-                  </button>
-                );
-              })}
-            </div>
+              return (
+                <button
+                  key={view}
+                  onClick={() => setLeadView(view)}
+                  className={`px-5 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
+                    leadView === view
+                      ? `${activeColor} shadow-md`
+                      : `text-slate-400 ${hoverColor}`
+                  }`}
+                >
+                  {view}
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
 
         {/* Main List */}
         <div className="hidden lg:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden w-full">
@@ -631,13 +620,13 @@ const LeadList = ({
               <thead>
                 <tr className="bg-slate-50/50">
                   <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
-                    {title === "Leads" ? "Lead Name" : "Client Name"}
+                    Lead Name
                   </th>
                   <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Contact Details
                   </th>
                   <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
-                    {title === "Leads" ? "Lead Category" : "Client Category"}
+                    Lead Category
                   </th>
                   <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Control
@@ -967,7 +956,7 @@ const LeadList = ({
           {filteredLeads.length === 0 && (
             <div className="col-span-full text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
               <p className="text-sm font-bold text-slate-400">
-                No {title.toLowerCase()} found matching your filters.
+                No leads found matching your filters.
               </p>
             </div>
           )}
@@ -995,10 +984,10 @@ const LeadList = ({
                 </div>
                 <div>
                   <h3 className="text-base font-bold tracking-tighter leading-none">
-                    New {title === "Leads" ? "Lead" : "Client"}
+                    New Lead
                   </h3>
                   <p className="text-slate-400 text-[9px] font-bold  tracking-widest mt-0.5">
-                    {title === "Leads" ? "Lead Details" : "Client Details"}
+                    Lead Details
                   </p>
                 </div>
               </div>
@@ -1008,627 +997,271 @@ const LeadList = ({
               onSubmit={handleSubmit}
               className="p-4 md:p-5 space-y-4 max-h-[65vh] overflow-y-auto"
             >
-              {title === "Leads" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {/* ADD LEAD FIELDS */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      LEAD NAME
-                    </label>
-                    <input
-                      required
-                      type="text"
-                      placeholder="e.g. Rahul Sharma"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* ADD LEAD FIELDS */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    LEAD NAME
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      EMAIL ID
-                    </label>
-                    <input
-                      required
-                      type="email"
-                      placeholder="rahul.sharma@example.com"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    EMAIL ID
+                  </label>
+                  <input
+                    required
+                    type="email"
+                    placeholder="rahul.sharma@example.com"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+                </div>
 
-                  <div className="space-y-1.5 relative">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      COUNTRY CODE
-                    </label>
-                    <button
-                      type="button"
-                      ref={countryButtonRef}
-                      onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium transition-all"
+                <div className="space-y-1.5 relative">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    COUNTRY CODE
+                  </label>
+                  <button
+                    type="button"
+                    ref={countryButtonRef}
+                    onClick={() =>
+                      setIsCountryDropdownOpen(!isCountryDropdownOpen)
+                    }
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium transition-all"
+                  >
+                    <span
+                      className={
+                        formData.country ? "text-[#18254D]" : "text-slate-400"
+                      }
                     >
-                      <span className={formData.country ? "text-[#18254D]" : "text-slate-400"}>
-                        {formData.country
-                          ? countries.find((c) => c.code === formData.country)?.name + " (" + formData.country + ")"
-                          : "Select Country Code"}
-                      </span>
-                      <ChevronDown
-                        size={16}
-                        className={`text-slate-400 transition-transform duration-300 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
+                      {formData.country
+                        ? countries.find((c) => c.code === formData.country)
+                            ?.name +
+                          " (" +
+                          formData.country +
+                          ")"
+                        : "Select Country Code"}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`text-slate-400 transition-transform duration-300 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
 
-                    {isCountryDropdownOpen &&
-                      createPortal(
-                        <>
-                          <div
-                            className="fixed inset-0 z-[9998]"
-                            onClick={() => setIsCountryDropdownOpen(false)}
-                          />
-                          <div
-                            className="country-dropdown bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-[9999] animate-fade-in flex flex-col"
-                            style={countryDropdownStyle}
-                          >
-                            <div className="p-2 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
-                              <Search size={14} className="text-slate-400 ml-1" />
-                              <input
-                                autoFocus
-                                type="text"
-                                placeholder="Search country or code..."
-                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium p-1"
-                                value={countrySearchTerm}
-                                onChange={(e) => setCountrySearchTerm(e.target.value)}
-                              />
-                              {countrySearchTerm && (
-                                <button
-                                  onClick={() => setCountrySearchTerm("")}
-                                  className="p-1 hover:bg-slate-100 rounded-lg text-slate-400"
-                                >
-                                  <X size={14} />
-                                </button>
-                              )}
-                            </div>
-                            <div className="max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar py-1">
-                              {countries
-                                .filter(
-                                  (c) =>
-                                    c.name.toLowerCase().includes(countrySearchTerm.toLowerCase()) ||
-                                    c.code.includes(countrySearchTerm)
-                                )
-                                .map((c) => (
-                                  <button
-                                    key={c.name + c.code}
-                                    type="button"
-                                    onClick={() => {
-                                      setFormData({ ...formData, country: c.code });
-                                      setIsCountryDropdownOpen(false);
-                                      setCountrySearchTerm("");
-                                    }}
-                                    className={`w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors text-left ${
-                                      formData.country === c.code ? "bg-secondary/5" : ""
-                                    }`}
-                                  >
-                                    <div className="flex flex-col">
-                                      <span className="text-sm font-bold text-[#18254D]">
-                                        {c.name}
-                                      </span>
-                                      <span className="text-[10px] text-slate-400 font-bold tracking-widest">
-                                        {c.code}
-                                      </span>
-                                    </div>
-                                    {formData.country === c.code && (
-                                      <Check size={16} className="text-secondary" />
-                                    )}
-                                  </button>
-                                ))}
-                            </div>
+                  {isCountryDropdownOpen &&
+                    createPortal(
+                      <>
+                        <div
+                          className="fixed inset-0 z-[9998]"
+                          onClick={() => setIsCountryDropdownOpen(false)}
+                        />
+                        <div
+                          className="country-dropdown bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-[9999] animate-fade-in flex flex-col"
+                          style={countryDropdownStyle}
+                        >
+                          <div className="p-2 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
+                            <Search size={14} className="text-slate-400 ml-1" />
+                            <input
+                              autoFocus
+                              type="text"
+                              placeholder="Search country or code..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium p-1"
+                              value={countrySearchTerm}
+                              onChange={(e) =>
+                                setCountrySearchTerm(e.target.value)
+                              }
+                            />
+                            {countrySearchTerm && (
+                              <button
+                                onClick={() => setCountrySearchTerm("")}
+                                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
                           </div>
-                        </>,
-                        document.body
-                      )}
-                  </div>
+                          <div className="max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar py-1">
+                            {countries
+                              .filter(
+                                (c) =>
+                                  c.name
+                                    .toLowerCase()
+                                    .includes(
+                                      countrySearchTerm.toLowerCase(),
+                                    ) || c.code.includes(countrySearchTerm),
+                              )
+                              .map((c) => (
+                                <button
+                                  key={c.name + c.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({
+                                      ...formData,
+                                      country: c.code,
+                                    });
+                                    setIsCountryDropdownOpen(false);
+                                    setCountrySearchTerm("");
+                                  }}
+                                  className={`w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors text-left ${
+                                    formData.country === c.code
+                                      ? "bg-secondary/5"
+                                      : ""
+                                  }`}
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-[#18254D]">
+                                      {c.name}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 font-bold tracking-widest">
+                                      {c.code}
+                                    </span>
+                                  </div>
+                                  {formData.country === c.code && (
+                                    <Check
+                                      size={16}
+                                      className="text-secondary"
+                                    />
+                                  )}
+                                </button>
+                              ))}
+                          </div>
+                        </div>
+                      </>,
+                      document.body,
+                    )}
+                </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      PHONE NUMBER
-                    </label>
-                    <input
-                      required
-                      type="tel"
-                      placeholder="e.g. +91 98765 43210"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "") })
-                      }
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    PHONE NUMBER
+                  </label>
+                  <input
+                    required
+                    type="tel"
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        phone: e.target.value.replace(/\D/g, ""),
+                      })
+                    }
+                  />
+                </div>
 
-                  <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      WEBSITE URL (OPTIONAL)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. www.company.com"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                      value={formData.website}
-                      onChange={(e) =>
-                        setFormData({ ...formData, website: e.target.value })
-                      }
-                    />
-                  </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    WEBSITE URL (OPTIONAL)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. www.company.com"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
+                    value={formData.website}
+                    onChange={(e) =>
+                      setFormData({ ...formData, website: e.target.value })
+                    }
+                  />
+                </div>
 
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      LEAD CATEGORY
-                    </label>
-                    <div className="flex gap-2">
-                      {["Tech", "Social Media"].map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() =>
-                            setFormData({ ...formData, projectCategory: cat })
-                          }
-                          className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
-                            formData.projectCategory === cat
-                              ? "border-primary bg-primary/5 text-primary shadow-sm"
-                              : "border-slate-100 text-slate-400 hover:border-slate-200"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      LEAD STATUS
-                    </label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {["Hot", "Warm", "Cold"].map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              leadType: type,
-                            })
-                          }
-                          className={`flex flex-col items-center justify-center gap-1 py-2 rounded-xl border-2 transition-all ${
-                            formData.leadType === type
-                              ? type === "Hot"
-                                ? "bg-error/5 border-error text-error shadow-lg shadow-error/10 scale-[1.02]"
-                                : type === "Warm"
-                                  ? "bg-warning/5 border-warning text-warning shadow-lg shadow-warning/10 scale-[1.02]"
-                                  : "bg-info/5 border-info text-info shadow-lg shadow-info/10 scale-[1.02]"
-                              : "bg-slate-50 border-slate-100 text-slate-400 grayscale opacity-60 hover:opacity-100 hover:grayscale-0"
-                          }`}
-                        >
-                          {type === "Hot" ? (
-                            <Flame size={14} strokeWidth={2.5} />
-                          ) : type === "Warm" ? (
-                            <Sun size={14} strokeWidth={2.5} />
-                          ) : (
-                            <Snowflake size={14} strokeWidth={2.5} />
-                          )}
-                          <span className="text-[8px] font-bold  tracking-widest">
-                            {type}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      NOTE
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="e.g. Interested in cloud migration services..."
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium resize-none shadow-sm"
-                      value={formData.notes || formData.industry}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          notes: e.target.value,
-                          industry: e.target.value,
-                        })
-                      }
-                    />
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    LEAD CATEGORY
+                  </label>
+                  <div className="flex gap-2">
+                    {["Tech", "Social Media"].map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() =>
+                          setFormData({ ...formData, projectCategory: cat })
+                        }
+                        className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
+                          formData.projectCategory === cat
+                            ? "border-primary bg-primary/5 text-primary shadow-sm"
+                            : "border-slate-100 text-slate-400 hover:border-slate-200"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ) : (
-                /* ADD CLIENT FIELDS */
-                <>
-                  {/* CLIENT DETAILS HEADING */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <div className="h-[2px] w-6 bg-secondary rounded-full" />
-                    <h4 className="text-[11px] font-bold text-[#18254D]  tracking-[0.2em]">
-                      Client Details
-                    </h4>
-                    <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
-                  </div>
 
-                  {/* CLIENT TYPE */}
-                  <div className="space-y-2 pb-1">
-                    <label className="text-[9px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      CLIENT TYPE
-                    </label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <label className="flex-1 flex items-center gap-2.5 p-3 bg-white border-2 border-[#18254D] rounded-xl cursor-pointer transition-all group shadow-sm">
-                        <div className="relative flex items-center justify-center">
-                          <input
-                            type="radio"
-                            name="clientType"
-                            value="New"
-                            checked={formData.clientType === "New"}
-                            readOnly
-                            className="peer appearance-none w-5 h-5 border-2 border-[#18254D] rounded-full checked:border-[#18254D] transition-all"
-                          />
-                          <div className="absolute w-2.5 h-2.5 bg-[#18254D] rounded-full" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-[#18254D] leading-none">
-                            New Client
-                          </p>
-                          <p className="text-[8px] text-slate-400 font-bold mt-0.5">
-                            First-time engagement
-                          </p>
-                        </div>
-                      </label>
-                      {/* EXISTING CLIENT REMOVED */}
-                    </div>
-                  </div>
-
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    LEAD STATUS
+                  </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* NAME & EMAIL */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        CLIENT NAME
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="e.g. Vikram Malhotra"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        EMAIL ID
-                      </label>
-                      <input
-                        required
-                        type="email"
-                        placeholder="vikram@enterprise.in"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    {/* PHONE & STATUS */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        PHONE NUMBER
-                      </label>
-                      <input
-                        required
-                        type="tel"
-                        placeholder="e.g. +44 20 7946 0958"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* PROJECT DETAILS HEADING */}
-                  <div className="flex items-center gap-2 pt-3">
-                    <div className="h-[2px] w-6 bg-secondary rounded-full" />
-                    <h4 className="text-[11px] font-bold text-[#18254D]  tracking-[0.2em]">
-                      Project Details
-                    </h4>
-                    <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* PROJECT NAME & STATUS */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        PROJECT NAME
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="e.g. Mobile App Development"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                        value={formData.projectName}
-                        onChange={(e) =>
+                    {["Hot", "Warm", "Cold"].map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() =>
                           setFormData({
                             ...formData,
-                            projectName: e.target.value,
+                            leadType: type,
                           })
                         }
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        PROJECT STATUS
-                      </label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setIsStatusDropdownOpen(!isStatusDropdownOpen)
-                          }
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium hover:border-secondary transition-all"
-                        >
-                          <span className="text-primary">
-                            {formData.projectStatus}
-                          </span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""}`}
-                          />
-                        </button>
-
-                        {isStatusDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-[80]"
-                              onClick={() => setIsStatusDropdownOpen(false)}
-                            />
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
-                              <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
-                                  Select Status
-                                </p>
-                              </div>
-                              {(formData.projectCategory === "Tech"
-                                ? ["Planning", "In Progress", "Testing", "Live"]
-                                : ["Planning", "In Progress", "Completed"]
-                              ).map((status) => (
-                                <button
-                                  key={status}
-                                  type="button"
-                                  onClick={() => {
-                                    setFormData({
-                                      ...formData,
-                                      projectStatus: status,
-                                    });
-                                    setIsStatusDropdownOpen(false);
-                                  }}
-                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
-                                    formData.projectStatus === status
-                                      ? "bg-slate-100 text-secondary"
-                                      : "text-[#18254D] hover:bg-slate-50"
-                                  }`}
-                                >
-                                  {status}
-                                </button>
-                              ))}
-                            </div>
-                          </>
+                        className={`flex flex-col items-center justify-center gap-1 py-2 rounded-xl border-2 transition-all ${
+                          formData.leadType === type
+                            ? type === "Hot"
+                              ? "bg-error/5 border-error text-error shadow-lg shadow-error/10 scale-[1.02]"
+                              : type === "Warm"
+                                ? "bg-warning/5 border-warning text-warning shadow-lg shadow-warning/10 scale-[1.02]"
+                                : "bg-info/5 border-info text-info shadow-lg shadow-info/10 scale-[1.02]"
+                            : "bg-slate-50 border-slate-100 text-slate-400 grayscale opacity-60 hover:opacity-100 hover:grayscale-0"
+                        }`}
+                      >
+                        {type === "Hot" ? (
+                          <Flame size={14} strokeWidth={2.5} />
+                        ) : type === "Warm" ? (
+                          <Sun size={14} strokeWidth={2.5} />
+                        ) : (
+                          <Snowflake size={14} strokeWidth={2.5} />
                         )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        LEAD CATEGORY
-                      </label>
-                      <div className="flex gap-2">
-                        {["Tech", "Social Media"].map((cat) => (
-                          <button
-                            key={cat}
-                            type="button"
-                            onClick={() =>
-                              setFormData({ ...formData, projectCategory: cat })
-                            }
-                            className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
-                              formData.projectCategory === cat
-                                ? "border-primary bg-primary/5 text-primary shadow-sm"
-                                : "border-slate-100 text-slate-400 hover:border-slate-200"
-                            }`}
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        PROJECT PRIORITY
-                      </label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setIsPriorityDropdownOpen(!isPriorityDropdownOpen)
-                          }
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium hover:border-secondary transition-all"
-                        >
-                          <span className="text-primary">
-                            {formData.projectPriority}
-                          </span>
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 transition-transform ${isPriorityDropdownOpen ? "rotate-180" : ""}`}
-                          />
-                        </button>
-
-                        {isPriorityDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-[80]"
-                              onClick={() => setIsPriorityDropdownOpen(false)}
-                            />
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
-                              <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
-                                  Select Priority
-                                </p>
-                              </div>
-                              {["High", "Medium", "Low"].map((level) => (
-                                <button
-                                  key={level}
-                                  type="button"
-                                  onClick={() => {
-                                    setFormData({
-                                      ...formData,
-                                      projectPriority: level,
-                                    });
-                                    setIsPriorityDropdownOpen(false);
-                                  }}
-                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
-                                    formData.projectPriority === level
-                                      ? "bg-slate-100 text-secondary"
-                                      : "text-[#18254D] hover:bg-slate-50"
-                                  }`}
-                                >
-                                  {level}
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* PROJECT DESCRIPTION */}
-                    <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        PROJECT DESCRIPTION
-                      </label>
-                      <textarea
-                        rows={2}
-                        placeholder="e.g. Design and develop a cross-platform mobile app for e-commerce..."
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-bold resize-none shadow-sm"
-                        value={formData.projectDescription}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            projectDescription: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-
-                    {/* PROJECT BUDGET */}
-                    <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 flex items-center gap-1.5">
-                        PROJECT BUDGET (INR)
-                      </label>
-                      <div className="relative">
-                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
-                          ₹
-                        </div>
-                        <input
-                          type="number"
-                          placeholder="e.g. 2,50,000"
-                          className="w-full pl-8 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium shadow-sm"
-                          value={formData.budget || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              budget: parseInt(e.target.value) || 0,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* DATES */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                          ONBOARDING DATE
-                        </label>
-                        <DatePicker
-                          value={formData.onboardingDate}
-                          onChange={(val) =>
-                            setFormData({
-                              ...formData,
-                              onboardingDate: val,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 whitespace-nowrap">
-                          DEADLINE (TENTATIVE)
-                        </label>
-                        <DatePicker
-                          value={formData.deadline}
-                          onChange={(val) =>
-                            setFormData({
-                              ...formData,
-                              deadline: val,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* SCOPE DOCUMENT */}
-                    <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                        SCOPE DOCUMENT
-                      </label>
-                      <div className="relative group">
-                        <input
-                          type="file"
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                              setFormData({
-                                ...formData,
-                                scopeDocument: file.name,
-                              });
-                            }
-                          }}
-                        />
-                        <div className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl group-hover:border-secondary group-hover:bg-secondary/5 transition-all flex items-center gap-3 shadow-sm">
-                          <div className="p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-                            <Upload size={16} className="text-secondary" />
-                          </div>
-                          <span
-                            className={`text-sm font-bold ${formData.scopeDocument ? "text-[#18254D]" : "text-slate-400"}`}
-                          >
-                            {formData.scopeDocument ||
-                              "Upload project requirements (PDF/DOCX)"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                        <span className="text-[8px] font-bold  tracking-widest">
+                          {type}
+                        </span>
+                      </button>
+                    ))}
                   </div>
-                </>
-              )}
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    NOTE
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. Interested in cloud migration services..."
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium resize-none shadow-sm"
+                    value={formData.notes || formData.industry}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        notes: e.target.value,
+                        industry: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
 
               <div className="pt-2">
                 <button
@@ -1639,7 +1272,7 @@ const LeadList = ({
                     size={20}
                     className="group-hover/btn:translate-x-1 transition-transform"
                   />
-                  <span>ADD {title === "Leads" ? "LEAD" : "CLIENT"}</span>
+                  <span>ADD LEAD</span>
                 </button>
               </div>
             </form>
@@ -1686,40 +1319,20 @@ const LeadList = ({
                 <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
               </div>
 
-              {/* CLIENT TYPE */}
               <div className="space-y-3 pb-2">
                 <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
                   CLIENT TYPE
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label
-                    className={`flex-1 flex items-center gap-3 p-4 bg-white border-2 rounded-xl cursor-pointer transition-all group shadow-sm ${
-                      onboardingData.clientType === "New"
-                        ? "border-[#18254D]"
-                        : "border-slate-100"
-                    }`}
-                  >
+                <div className="grid grid-cols-1 gap-4">
+                  <label className="flex-1 flex items-center gap-3 p-4 bg-white border-2 border-[#18254D] rounded-xl cursor-default transition-all group shadow-sm">
                     <div className="relative flex items-center justify-center">
                       <input
                         type="radio"
-                        name="onboardClientType"
-                        value="New"
-                        checked={onboardingData.clientType === "New"}
-                        onChange={() =>
-                          setOnboardingData({
-                            ...onboardingData,
-                            clientType: "New",
-                          })
-                        }
-                        className="peer appearance-none w-6 h-6 border-2 border-slate-200 rounded-full checked:border-[#18254D] transition-all"
+                        checked={true}
+                        readOnly
+                        className="peer appearance-none w-6 h-6 border-2 border-[#18254D] rounded-full transition-all"
                       />
-                      <div
-                        className={`absolute w-3 h-3 bg-[#18254D] rounded-full transition-transform ${
-                          onboardingData.clientType === "New"
-                            ? "scale-100"
-                            : "scale-0"
-                        }`}
-                      />
+                      <div className="absolute w-3 h-3 bg-[#18254D] rounded-full" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-[#18254D] leading-none">
@@ -1727,47 +1340,6 @@ const LeadList = ({
                       </p>
                       <p className="text-[9px] text-slate-400 font-bold mt-1">
                         First-time engagement
-                      </p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex-1 flex items-center gap-3 p-4 bg-white border-2 rounded-xl cursor-pointer transition-all group shadow-sm ${
-                      onboardingData.clientType === "Existing Client"
-                        ? "border-[#18254D]"
-                        : "border-slate-100"
-                    }`}
-                  >
-                    <div className="relative flex items-center justify-center">
-                      <input
-                        type="radio"
-                        name="onboardClientType"
-                        value="Existing Client"
-                        checked={
-                          onboardingData.clientType === "Existing Client"
-                        }
-                        onChange={() =>
-                          setOnboardingData({
-                            ...onboardingData,
-                            clientType: "Existing Client",
-                          })
-                        }
-                        className="peer appearance-none w-6 h-6 border-2 border-slate-200 rounded-full checked:border-[#18254D] transition-all"
-                      />
-                      <div
-                        className={`absolute w-3 h-3 bg-[#18254D] rounded-full transition-transform ${
-                          onboardingData.clientType === "Existing Client"
-                            ? "scale-100"
-                            : "scale-0"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#18254D] leading-none">
-                        Existing Client
-                      </p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
-                        Returning or Converted
                       </p>
                     </div>
                   </label>
@@ -1779,116 +1351,19 @@ const LeadList = ({
                   <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
                     CLIENT NAME
                   </label>
-                  <div className="relative">
-                    {onboardingData.clientType === "Existing Client" ? (
-                      <div className="relative">
-                        <div
-                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl focus-within:ring-4 focus-within:ring-secondary/10 focus-within:border-secondary transition-all cursor-pointer flex items-center justify-between shadow-sm shadow-slate-200/50 group"
-                          onClick={() =>
-                            setIsClientDropdownOpen(!isClientDropdownOpen)
-                          }
-                        >
-                          <span
-                            className={`text-sm font-bold  tracking-tight ${onboardingData.name ? "text-primary" : "text-slate-400"}`}
-                          >
-                            {onboardingData.name || "Select an existing client"}
-                          </span>
-                          <ChevronDown
-                            size={16}
-                            strokeWidth={3}
-                            className={`text-slate-400 transition-transform duration-300 ${isClientDropdownOpen ? "rotate-180" : ""}`}
-                          />
-                        </div>
-
-                        {isClientDropdownOpen && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[110] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div className="p-3 border-b border-slate-100 bg-slate-50/50">
-                              <div className="relative">
-                                <Search
-                                  size={14}
-                                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="Search by name..."
-                                  className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"
-                                  value={clientSearchQuery}
-                                  onChange={(e) =>
-                                    setClientSearchQuery(e.target.value)
-                                  }
-                                  onClick={(e) => e.stopPropagation()}
-                                  autoFocus
-                                />
-                              </div>
-                            </div>
-                            <div className="max-h-[200px] overflow-y-auto p-2">
-                              {allClients
-                                .filter(
-                                  (c) =>
-                                    c.status !== "Lead" &&
-                                    c.name
-                                      .toLowerCase()
-                                      .includes(
-                                        clientSearchQuery.toLowerCase(),
-                                      ),
-                                )
-                                .map((client) => (
-                                  <div
-                                    key={client.id}
-                                    className="px-4 py-3 hover:bg-slate-50 rounded-xl cursor-pointer group transition-colors"
-                                    onClick={() => {
-                                      setOnboardingData({
-                                        ...onboardingData,
-                                        name: client.name,
-                                        email: client.email,
-                                        phone: client.phone,
-                                      });
-                                      setIsClientDropdownOpen(false);
-                                      setClientSearchQuery("");
-                                    }}
-                                  >
-                                    <p className="text-sm font-bold text-[#18254D] group-hover:text-secondary transition-colors">
-                                      {client.name}
-                                    </p>
-                                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">
-                                      {client.company || client.email}
-                                    </p>
-                                  </div>
-                                ))}
-                              {allClients.filter(
-                                (c) =>
-                                  c.status !== "Lead" &&
-                                  c.name
-                                    .toLowerCase()
-                                    .includes(clientSearchQuery.toLowerCase()),
-                              ).length === 0 && (
-                                <div className="p-6 text-center">
-                                  <p className="text-xs font-bold text-slate-400">
-                                    No clients found matching "
-                                    {clientSearchQuery}"
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <input
-                        required
-                        type="text"
-                        placeholder="e.g. Anand Kumar"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                        value={onboardingData.name}
-                        onChange={(e) =>
-                          setOnboardingData({
-                            ...onboardingData,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    )}
-                  </div>
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Anand Kumar"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
+                    value={onboardingData.name}
+                    onChange={(e) =>
+                      setOnboardingData({
+                        ...onboardingData,
+                        name: e.target.value,
+                      })
+                    }
+                  />
                 </div>
 
                 <div className="space-y-2">
