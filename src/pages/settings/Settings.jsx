@@ -1351,13 +1351,15 @@ const Settings = ({
                     </p>
                   </div>
                   {/* Add Admin Button */}
-                  <button
-                    onClick={() => setShowAddAdminForm(!showAddAdminForm)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg shrink-0"
-                  >
-                    <Plus size={16} strokeWidth={2.5} />
-                    Add Admin
-                  </button>
+                  {profile?.role !== "Admin" && (
+                    <button
+                      onClick={() => setShowAddAdminForm(!showAddAdminForm)}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg shrink-0"
+                    >
+                      <Plus size={16} strokeWidth={2.5} />
+                      Add Admin
+                    </button>
+                  )}
                 </div>
 
                 {/* Add Admin Form */}
@@ -1615,7 +1617,8 @@ const Settings = ({
                           </div>
                           <div className="flex gap-2">
                             {editingAdminId !== admin.id &&
-                              admin.role !== "Root Admin" && (
+                              admin.role !== "Root Admin" &&
+                              profile?.role !== "Admin" && (
                                 <>
                                   <button
                                     onClick={() => handleStartEditAdmin(admin)}
