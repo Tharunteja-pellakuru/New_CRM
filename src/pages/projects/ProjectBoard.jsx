@@ -420,14 +420,17 @@ const ProjectBoard = ({
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isClientStatusDropdownOpen, setIsClientStatusDropdownOpen] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState(null);
+  const [clientSearch, setClientSearch] = useState("");
+  const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     projectName: "",
-    projectStatus: "Planning",
+    projectStatus: "In Progress",
     projectCategory: 1,
-    projectPriority: "Medium",
+    projectPriority: "High",
     projectDescription: "",
     country: "",
     state: "",
@@ -436,7 +439,7 @@ const ProjectBoard = ({
     clientStatus: "Active",
     onboardingDate: new Date().toISOString().split("T")[0],
     deadline: "",
-    budget: 0,
+    budget: "",
     scopeDocument: "",
   });
 
@@ -477,47 +480,39 @@ const ProjectBoard = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Create client first
-    if (onAddClient) {
-      const newClient = await onAddClient({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        country: formData.country,
-        state: formData.state,
-        currency: formData.currency,
-        organisationName: formData.organisationName,
-        clientStatus: formData.clientStatus,
-        status: "Active",
-      });
+    if (!selectedClientId) {
+      alert("Please select an existing client.");
+      return;
+    }
 
-      if (newClient && newClient.id && onAddProject) {
-        // 2. Create project entry using the real client ID
-        await onAddProject({
-          clientId: newClient.id,
-          name: formData.projectName,
-          description: formData.projectDescription,
-          projectCategory: formData.projectCategory,
-          projectStatus: formData.projectStatus,
-          projectPriority: formData.projectPriority,
-          budget: formData.budget,
-          onboardingDate: formData.onboardingDate,
-          deadline: formData.deadline,
-          scopeDocument: formData.scopeDocument,
-        });
-      }
+    // Create project using the selected existing client ID
+    if (onAddProject) {
+      await onAddProject({
+        clientId: selectedClientId,
+        name: formData.projectName,
+        description: formData.projectDescription,
+        projectCategory: formData.projectCategory,
+        projectStatus: formData.projectStatus,
+        projectPriority: formData.projectPriority,
+        budget: formData.budget,
+        onboardingDate: formData.onboardingDate,
+        deadline: formData.deadline,
+        scopeDocument: formData.scopeDocument,
+      });
     }
 
     setShowAddModal(false);
     // Reset form
+    setSelectedClientId(null);
+    setClientSearch("");
     setFormData({
       name: "",
       email: "",
       phone: "",
       projectName: "",
-      projectStatus: "Planning",
+      projectStatus: "In Progress",
       projectCategory: 1,
-      projectPriority: "Medium",
+      projectPriority: "High",
       projectDescription: "",
       country: "",
       state: "",
@@ -526,7 +521,7 @@ const ProjectBoard = ({
       clientStatus: "Active",
       onboardingDate: new Date().toISOString().split("T")[0],
       deadline: "",
-      budget: 0,
+      budget: "",
       scopeDocument: "",
     });
   };
@@ -817,7 +812,7 @@ const ProjectBoard = ({
                 <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
               </div>
 
-              {/* CLIENT TYPE (Simplified version as per image) */}
+              {/* CLIENT TYPE */}
               <div className="space-y-3 pb-2">
                 <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
                   CLIENT TYPE
@@ -835,214 +830,164 @@ const ProjectBoard = ({
                     </div>
                     <div>
                       <p className="text-sm font-bold text-[#18254D] leading-none">
-                        New Client
+                        Existing Client
                       </p>
                       <p className="text-[9px] text-slate-400 font-bold mt-1">
-                        First-time engagement
+                        Select from your client list
                       </p>
                     </div>
                   </label>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* NAME & EMAIL */}
-                <div className="space-y-2 relative">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                    CLIENT NAME
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="e.g. Anand Kumar"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                    EMAIL ID
-                  </label>
-                  <input
-                    required
-                    type="email"
-                    placeholder="e.g. anand.kumar@fintech.in"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                    PHONE NUMBER
-                  </label>
-                  <input
-                    required
-                    type="tel"
-                    placeholder="+91 98765 43210"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        phone: e.target.value.replace(/\D/g, ""),
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                    ORGANISATION NAME
-                  </label>
+              {/* CLIENT NAME SEARCHABLE DROPDOWN */}
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  CLIENT NAME
+                </label>
+                <div className="relative">
                   <input
                     type="text"
-                    placeholder="e.g. Acme Corp"
+                    placeholder="Search existing clients..."
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                    value={formData.organisationName || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        organisationName: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-
-                <SearchableDropdown
-                  label="CLIENT COUNTRY"
-                  options={countries.map((c) => ({
-                    name: c.name,
-                    code: c.name,
-                  }))}
-                  value={formData.country}
-                  onChange={(val) => {
-                    const countryCurrency = countryToCurrency[val];
-                    setFormData({
-                      ...formData,
-                      country: val,
-                      currency: countryCurrency
-                        ? countryCurrency.code
-                        : formData.currency,
-                      state: "", // Reset state when country changes
-                    });
-                  }}
-                  placeholder="Select Country"
-                />
-
-                {formData.country === "India" ? (
-                  <SearchableDropdown
-                    label="CLIENT STATE"
-                    options={indianStates}
-                    value={formData.state}
-                    onChange={(val) => setFormData({ ...formData, state: val })}
-                    placeholder="Select State"
-                  />
-                ) : (
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
-                      CLIENT STATE
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. California"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-secondary/10 focus:border-secondary focus:outline-none text-sm font-medium"
-                      value={formData.state || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          state: e.target.value,
-                        })
+                    value={clientSearch}
+                    onChange={(e) => {
+                      setClientSearch(e.target.value);
+                      setIsClientDropdownOpen(true);
+                      if (!e.target.value) {
+                        setSelectedClientId(null);
+                        setFormData(prev => ({
+                          ...prev,
+                          name: "",
+                          email: "",
+                          phone: "",
+                          country: "",
+                          state: "",
+                          currency: "",
+                          organisationName: "",
+                        }));
                       }
-                    />
-                  </div>
-                )}
+                    }}
+                    onFocus={() => setIsClientDropdownOpen(true)}
+                  />
+                  <ChevronDown
+                    size={14}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-transform ${isClientDropdownOpen ? "rotate-180" : ""}`}
+                  />
 
-                <SearchableDropdown
-                  label="CLIENT CURRENCY"
-                  options={commonCurrencies.map((c) => ({
-                    name: `${c.code} (${c.symbol})`,
-                    code: c.code,
-                  }))}
-                  value={formData.currency}
-                  onChange={(val) =>
-                    setFormData({ ...formData, currency: val })
-                  }
-                  placeholder="Select Currency"
-                />
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
-                    CLIENT STATUS
-                  </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setIsClientStatusDropdownOpen(
-                          !isClientStatusDropdownOpen,
-                        )
-                      }
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:border-secondary transition-all"
-                    >
-                      <span className="text-primary truncate">
-                        {formData.clientStatus || "Active"}
-                      </span>
-                      <ChevronDown
-                        size={16}
-                        className={`text-slate-400 transition-transform ${
-                          isClientStatusDropdownOpen ? "rotate-180" : ""
-                        }`}
+                  {isClientDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-[80]"
+                        onClick={() => setIsClientDropdownOpen(false)}
                       />
-                    </button>
-
-                    {isClientStatusDropdownOpen && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-[80]"
-                          onClick={() =>
-                            setIsClientStatusDropdownOpen(false)
-                          }
-                        />
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
-                          <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
-                              Select Status
-                            </p>
-                          </div>
-                          {["Active", "Inactive"].map((status) => (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top max-h-[200px] overflow-y-auto">
+                        <div className="bg-[#18254D] px-4 py-3 border-b border-white/10 sticky top-0">
+                          <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            Select Client
+                          </p>
+                        </div>
+                        {clients
+                          .filter(
+                            (c) =>
+                              c.status !== "Lead" &&
+                              c.status !== "Dismissed" &&
+                              (!clientSearch ||
+                                c.name?.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                                c.company?.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                                c.email?.toLowerCase().includes(clientSearch.toLowerCase()))
+                          )
+                          .map((client) => (
                             <button
-                              key={status}
+                              key={client.id}
                               type="button"
                               onClick={() => {
-                                setFormData({
-                                  ...formData,
-                                  clientStatus: status,
-                                });
-                                setIsClientStatusDropdownOpen(false);
+                                setSelectedClientId(client.id);
+                                setClientSearch(client.name);
+                                setIsClientDropdownOpen(false);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  name: client.name,
+                                  email: client.email || "",
+                                  phone: client.phone || "",
+                                  country: client.country || "",
+                                  state: client.state || "",
+                                  currency: client.currency || "INR",
+                                  organisationName: client.company || "",
+                                  clientStatus: client.status || "Active",
+                                }));
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
-                                formData.clientStatus === status
-                                  ? "bg-slate-100 text-secondary"
-                                  : "text-[#18254D] hover:bg-slate-50"
+                              className={`w-full text-left px-4 py-2.5 transition-colors border-b border-slate-50 last:border-0 ${
+                                selectedClientId === client.id
+                                  ? "bg-slate-100"
+                                  : "hover:bg-slate-50"
                               }`}
                             >
-                              {status}
+                              <p className="text-[11px] font-bold text-[#18254D]">
+                                {client.name}
+                              </p>
+                              <p className="text-[9px] text-slate-400 font-medium mt-0.5">
+                                {client.email}
+                                {client.company ? ` · ${client.company}` : ""}
+                              </p>
                             </button>
                           ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                        {clients.filter(
+                          (c) =>
+                            c.status !== "Lead" &&
+                            c.status !== "Dismissed" &&
+                            (!clientSearch ||
+                              c.name?.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                              c.company?.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                              c.email?.toLowerCase().includes(clientSearch.toLowerCase()))
+                        ).length === 0 && (
+                          <p className="px-4 py-3 text-[10px] text-slate-400 font-bold text-center">
+                            No clients found
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {/* AUTO-FILLED CLIENT INFO (read-only) */}
+              {selectedClientId && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                      EMAIL
+                    </label>
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                      {formData.email || "—"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                      PHONE
+                    </label>
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                      {formData.phone || "—"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                      COUNTRY
+                    </label>
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                      {formData.country || "—"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                      CURRENCY
+                    </label>
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                      {formData.currency || "—"}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* PROJECT DETAILS HEADING */}
               <div className="flex items-center gap-3 pt-6">
@@ -1107,7 +1052,7 @@ const ProjectBoard = ({
                           setFormData({
                             ...formData,
                             projectCategory: catId,
-                            projectStatus: "Planning",
+                            projectStatus: "In Progress",
                           })
                         }
                         className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
@@ -1155,10 +1100,7 @@ const ProjectBoard = ({
                               Select Status
                             </p>
                           </div>
-                          {(formData.projectCategory === 1
-                            ? ["Planning", "In Progress", "Testing", "Live"]
-                            : ["Planning", "In Progress", "Completed"]
-                          ).map((status) => (
+                          {["In Progress", "Hold", "Completed"].map((status) => (
                             <button
                               key={status}
                               type="button"
