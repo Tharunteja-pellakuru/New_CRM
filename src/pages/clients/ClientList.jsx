@@ -693,7 +693,7 @@ const ClientList = ({
                                     .split("T")[0],
                                   deadline: "",
                                   scopeDocument: "",
-                                  projectStatus: "Planning",
+                                  projectStatus: "In Progress",
                                 });
                                 setShowOnboardModal(true);
                               }}

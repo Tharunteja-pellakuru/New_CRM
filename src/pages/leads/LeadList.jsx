@@ -930,7 +930,7 @@ const LeadList = ({
                                         .split("T")[0],
                                       deadline: "",
                                       scopeDocument: "",
-                                      projectStatus: "Planning",
+                                      projectStatus: "In Progress",
                                       clientStatus: "Active",
                                     });
                                     setShowOnboardModal(true);
