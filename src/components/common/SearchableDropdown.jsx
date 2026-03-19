@@ -52,7 +52,7 @@ const SearchableDropdown = ({
   return (
     <div className={`space-y-1.5 ${className}`} ref={dropdownRef}>
       {label && (
-        <label className="text-[10px] font-bold text-[#18254D] tracking-widest ml-1 uppercase">
+        <label className="text-[12px] font-bold text-[#18254D] tracking-widest ml-1 uppercase">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -117,7 +117,7 @@ const SearchableDropdown = ({
                       key={index}
                       type="button"
                       onClick={() => handleSelect(option)}
-                      className={`w-full text-left px-4 py-2.5 text-[11px] font-bold tracking-widest transition-colors flex items-center justify-between ${
+                      className={`w-full text-left px-4 py-2.5 text-[13px] font-bold tracking-widest transition-colors flex items-center justify-between ${
                         isSelected
                           ? "bg-secondary/5 text-secondary"
                           : "text-[#18254D] hover:bg-slate-50"
@@ -136,7 +136,7 @@ const SearchableDropdown = ({
                 })
               ) : (
                 <div className="px-4 py-4 text-center">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">
                     No results found
                   </p>
                 </div>

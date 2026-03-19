@@ -132,7 +132,7 @@ const Settings = ({
     onChange,
   }) => (
     <div className="space-y-2 relative">
-      <label className="text-[10px] font-bold text-slate-400 tracking-widest ml-1 uppercase opacity-60">
+      <label className="text-[12px] font-bold text-slate-400 tracking-widest ml-1 uppercase opacity-60">
         {label}
       </label>
       <button
@@ -167,7 +167,7 @@ const Settings = ({
           />
           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[120] animate-fade-in origin-top py-2">
             <div className="bg-[#18254D] px-4 py-2 border-b border-white/10 -mt-2 mb-1">
-              <p className="text-[9px] font-bold text-white/50 tracking-widest uppercase">
+              <p className="text-[14px] font-bold text-white/50 tracking-widest uppercase">
                 Select {label}
               </p>
             </div>
@@ -182,7 +182,7 @@ const Settings = ({
                     onChange(optValue);
                     setActiveDropdown(null);
                   }}
-                  className={`w-full text-left px-5 py-3 text-[10px] font-bold tracking-widest transition-colors flex items-center justify-between ${
+                  className={`w-full text-left px-5 py-3 text-[12px] font-bold tracking-widest transition-colors flex items-center justify-between ${
                     optValue === value
                       ? "bg-slate-50 text-secondary"
                       : "text-[#18254D] hover:bg-slate-50"
@@ -628,7 +628,7 @@ const Settings = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
+                className={`px-6 h-full rounded-xl text-[12px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-white text-blue-600 shadow-md border-blue-50"
                     : "text-slate-400 hover:text-slate-500 hover:bg-white/50"
@@ -708,7 +708,7 @@ const Settings = ({
                         <h3 className="text-2xl font-bold text-primary mb-1 tracking-tight">
                           {profile.full_name}
                         </h3>
-                        <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[10px]  font-bold tracking-widest">
+                        <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[12px]  font-bold tracking-widest">
                           {profile.role}
                         </span>
                       </div>
@@ -728,13 +728,13 @@ const Settings = ({
                 <div className="space-y-6">
                   <div>
                     <div className="mb-4">
-                      <h4 className="text-[10px] font-bold text-slate-400  tracking-[0.2em] ml-1">
+                      <h4 className="text-[12px] font-bold text-slate-400  tracking-[0.2em] ml-1">
                         Basic Information
                       </h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
+                        <label className="text-[12px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
                           <User size={12} className="text-slate-400" />
                           Full Name
                         </label>
@@ -756,7 +756,7 @@ const Settings = ({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
+                        <label className="text-[12px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
                           <Building2 size={12} className="text-slate-400" />
                           Designation
                         </label>
@@ -768,7 +768,7 @@ const Settings = ({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
+                        <label className="text-[12px] font-bold text-slate-400  tracking-widest ml-1 flex items-center gap-2">
                           <Mail size={12} className="text-slate-400" />
                           Email Address
                         </label>
@@ -787,7 +787,7 @@ const Settings = ({
                       <button
                         onClick={handleProfileSave}
                         disabled={isProfileSaved}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold disabled:opacity-70 shadow-lg shadow-primary/20"
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold disabled:opacity-70 shadow-lg shadow-primary/20"
                       >
                         {isProfileSaved ? (
                           <>
@@ -841,7 +841,7 @@ const Settings = ({
                 <div className="pt-6 border-t border-slate-100">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                      <h4 className="text-[10px] font-bold text-primary tracking-[0.2em] flex items-center gap-2">
+                      <h4 className="text-[12px] font-bold text-primary tracking-[0.2em] flex items-center gap-2">
                         <Bot size={14} className="text-violet-500" />
                         AI MODELS ({aiModels.length})
                       </h4>
@@ -851,7 +851,7 @@ const Settings = ({
                     </div>
                     {/* <button
                       onClick={() => setShowAddModelForm(!showAddModelForm)}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold tracking-wider shadow-lg"
                     >
                       <Plus size={16} />
                       ADD AI MODEL
@@ -867,7 +867,7 @@ const Settings = ({
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-2">
-                          <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                          <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                             Display Name
                           </label>
                           <input
@@ -900,7 +900,7 @@ const Settings = ({
                           }
                         />
                         <div className="space-y-2">
-                          <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                          <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                             Model ID (exact)
                           </label>
                           <input
@@ -917,7 +917,7 @@ const Settings = ({
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px]  font-bold text-slate-500 tracking-widest flex items-center gap-1.5">
+                          <label className="text-[12px]  font-bold text-slate-500 tracking-widest flex items-center gap-1.5">
                             <Key size={12} className="text-slate-400" />
                             API Key
                           </label>
@@ -958,14 +958,14 @@ const Settings = ({
                             !newModel.modelId ||
                             !newModel.apiKey
                           }
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider disabled:bg-primary/50 disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold tracking-wider disabled:bg-primary/50 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                           <Check size={16} />
                           Add Model
                         </button>
                         <button
                           onClick={() => setShowAddModelForm(false)}
-                          className="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-2xl hover:bg-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                          className="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-2xl hover:bg-slate-300 transition-all text-[13px] font-bold tracking-wider"
                         >
                           Cancel
                         </button>
@@ -1049,7 +1049,7 @@ const Settings = ({
                             <div className="space-y-4">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div className="space-y-2">
-                                  <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                  <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                                     Display Name
                                   </label>
                                   <input
@@ -1096,7 +1096,7 @@ const Settings = ({
                                   }
                                 />
                                 <div className="space-y-2">
-                                  <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                  <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                                     Model ID
                                   </label>
                                   <input
@@ -1112,7 +1112,7 @@ const Settings = ({
                                   />
                                 </div>
                                 <div className="space-y-2">
-                                  <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                  <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                                     API Key
                                   </label>
                                   <input
@@ -1134,13 +1134,13 @@ const Settings = ({
                                     onUpdateAiModel(editModelData);
                                     setEditingModelId(null);
                                   }}
-                                  className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold tracking-wider"
+                                  className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[13px] font-bold tracking-wider"
                                 >
                                   Save
                                 </button>
                                 <button
                                   onClick={() => setEditingModelId(null)}
-                                  className="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-2xl hover:bg-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                                  className="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-2xl hover:bg-slate-300 transition-all text-[13px] font-bold tracking-wider"
                                 >
                                   Cancel
                                 </button>
@@ -1169,12 +1169,12 @@ const Settings = ({
                                       {model.name}
                                     </h5>
                                     {!!model.isDefault && (
-                                      <span className="text-[8px] px-2 py-0.5 bg-primary text-white rounded-full font-bold tracking-widest uppercase">
+                                      <span className="text-[13px] px-2 py-0.5 bg-primary text-white rounded-full font-bold tracking-widest uppercase">
                                         Default
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-[10px] text-slate-400 font-mono font-bold truncate mt-0.5">
+                                  <p className="text-[12px] text-slate-400 font-mono font-bold truncate mt-0.5">
                                     {model.modelId}
                                   </p>
                                 </div>
@@ -1185,7 +1185,7 @@ const Settings = ({
                                     setEditingModelId(model.id);
                                     setEditModelData({ ...model });
                                   }}
-                                  className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-primary flex items-center gap-2 text-[10px] font-bold group"
+                                  className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-primary flex items-center gap-2 text-[12px] font-bold group"
                                   title="Edit model"
                                 >
                                   <Edit2
@@ -1197,7 +1197,7 @@ const Settings = ({
                                 {!model.isDefault && (
                                   <button
                                     onClick={() => onDeleteAiModel(model.id)}
-                                    className="p-2.5 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500 flex items-center gap-2 text-[10px] font-bold group"
+                                    className="p-2.5 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500 flex items-center gap-2 text-[12px] font-bold group"
                                     title="Delete model"
                                   >
                                     <Trash2
@@ -1220,7 +1220,7 @@ const Settings = ({
                   <button
                     onClick={handleAiSettingsSave}
                     disabled={!isAiEditing}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-[11px] font-bold tracking-wider transition-all ${
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-[13px] font-bold tracking-wider transition-all ${
                       isAiEditing
                         ? "bg-primary text-white hover:bg-slate-800 active:scale-95 shadow-lg"
                         : "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -1260,7 +1260,7 @@ const Settings = ({
                   {!showPasswordForm ? (
                     <button
                       onClick={() => setShowPasswordForm(true)}
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold tracking-wider shadow-lg"
                     >
                       <Lock size={14} strokeWidth={2.5} />
                       Update Password
@@ -1268,7 +1268,7 @@ const Settings = ({
                   ) : (
                     <div className="space-y-5">
                       <div className="space-y-2">
-                        <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                        <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                           Current Password
                         </label>
                         <input
@@ -1285,7 +1285,7 @@ const Settings = ({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                        <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                           New Password
                         </label>
                         <input
@@ -1302,7 +1302,7 @@ const Settings = ({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                        <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                           Confirm New Password
                         </label>
                         <input
@@ -1321,14 +1321,14 @@ const Settings = ({
                       <div className="flex gap-3 pt-3">
                         <button
                           onClick={handleUpdatePassword}
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg shadow-primary/20"
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold tracking-wider shadow-lg shadow-primary/20"
                         >
                           <Save size={16} strokeWidth={2.5} />
                           Update Password
                         </button>
                         <button
                           onClick={() => setShowPasswordForm(false)}
-                          className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                          className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[13px] font-bold tracking-wider"
                         >
                           Cancel
                         </button>
@@ -1355,7 +1355,7 @@ const Settings = ({
                   {profile?.role !== "Admin" && (
                     <button
                       onClick={() => setShowAddAdminForm(!showAddAdminForm)}
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[11px] font-bold tracking-wider shadow-lg shrink-0"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all active:scale-95 text-[13px] font-bold tracking-wider shadow-lg shrink-0"
                     >
                       <Plus size={16} strokeWidth={2.5} />
                       Add Admin
@@ -1371,7 +1371,7 @@ const Settings = ({
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
                       <div className="space-y-2 lg:col-span-1">
-                        <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                        <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                           Full Name
                         </label>
                         <input
@@ -1385,7 +1385,7 @@ const Settings = ({
                         />
                       </div>
                       <div className="space-y-2 lg:col-span-1">
-                        <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                        <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                           Email Address
                         </label>
                         <input
@@ -1436,14 +1436,14 @@ const Settings = ({
                     <div className="flex gap-3 pt-3">
                       <button
                         onClick={handleAddAdmin}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 active:scale-95 transition-all text-[11px] font-bold tracking-wider shadow-lg shadow-primary/20"
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 active:scale-95 transition-all text-[13px] font-bold tracking-wider shadow-lg shadow-primary/20"
                       >
                         <Check size={16} strokeWidth={2.5} />
                         Add Admin
                       </button>
                       <button
                         onClick={() => setShowAddAdminForm(false)}
-                        className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                        className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[13px] font-bold tracking-wider"
                       >
                         Cancel
                       </button>
@@ -1453,7 +1453,7 @@ const Settings = ({
 
                 {/* Admins List */}
                 <div className="space-y-4">
-                  <h4 className="text-[10px] font-bold text-primary  tracking-[0.2em] ml-1">
+                  <h4 className="text-[12px] font-bold text-primary  tracking-[0.2em] ml-1">
                     Current Users ({admins.length})
                   </h4>
 
@@ -1484,7 +1484,7 @@ const Settings = ({
                               <div className="space-y-5">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                   <div className="space-y-2">
-                                    <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                    <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                                       Full Name
                                     </label>
                                     <input
@@ -1500,7 +1500,7 @@ const Settings = ({
                                     />
                                   </div>
                                   <div className="space-y-2">
-                                    <label className="text-[10px]  font-bold text-slate-500 tracking-widest">
+                                    <label className="text-[12px]  font-bold text-slate-500 tracking-widest">
                                       Email
                                     </label>
                                     <input
@@ -1566,13 +1566,13 @@ const Settings = ({
                                     onClick={() =>
                                       handleSaveEditAdmin(admin.id)
                                     }
-                                    className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold tracking-wider shadow-lg"
+                                    className="px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[13px] font-bold tracking-wider shadow-lg"
                                   >
                                     Save
                                   </button>
                                   <button
                                     onClick={handleCancelEditAdmin}
-                                    className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[11px] font-bold tracking-wider"
+                                    className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all text-[13px] font-bold tracking-wider"
                                   >
                                     Cancel
                                   </button>
@@ -1605,19 +1605,19 @@ const Settings = ({
                                     <h5 className="font-bold text-slate-900 tracking-tight">
                                       {admin.name}
                                     </h5>
-                                    <p className="text-[11px] font-bold text-slate-500">
+                                    <p className="text-[13px] font-bold text-slate-500">
                                       {admin.email}
                                     </p>
                                   </div>
                                 </div>
                                 <div className="flex gap-3 mt-4 ml-14">
-                                  <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-bold  tracking-widest">
+                                  <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-lg text-[12px] font-bold  tracking-widest">
                                     {admin.role}
                                   </span>
-                                  <span className="inline-block px-3 py-1 bg-green-100/50 border border-green-200 text-green-700 rounded-lg text-[10px] font-bold  tracking-widest">
+                                  <span className="inline-block px-3 py-1 bg-green-100/50 border border-green-200 text-green-700 rounded-lg text-[12px] font-bold  tracking-widest">
                                     {admin.status}
                                   </span>
-                                  <span className="inline-block px-3 py-1 bg-blue-100/50 border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold  tracking-widest">
+                                  <span className="inline-block px-3 py-1 bg-blue-100/50 border border-blue-200 text-blue-700 rounded-lg text-[12px] font-bold  tracking-widest">
                                     {CATEGORY_MAP[admin.privileges] || "Both"}
                                   </span>
                                 </div>
@@ -1693,13 +1693,13 @@ const Settings = ({
             <div className="flex justify-end gap-3">
               <button
                 onClick={hideConfirmModal}
-                className="px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-[11px] font-bold tracking-wider hover:bg-slate-50 hover:border-slate-300 transition-all"
+                className="px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-[13px] font-bold tracking-wider hover:bg-slate-50 hover:border-slate-300 transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmModal.onConfirm}
-                className="px-4 py-2.5 rounded-2xl bg-primary text-white text-[11px] font-bold tracking-wider hover:bg-slate-800 transition-all shadow-lg"
+                className="px-4 py-2.5 rounded-2xl bg-primary text-white text-[13px] font-bold tracking-wider hover:bg-slate-800 transition-all shadow-lg"
               >
                 Delete
               </button>

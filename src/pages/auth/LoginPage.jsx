@@ -85,7 +85,7 @@ function LoginPage({ onLogin }) {
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary tracking-tighter leading-none">
               Parivartan
             </h1>
-            <p className="text-[10px] md:text-xs lg:text-sm font-bold text-slate-500  tracking-[0.4em] mt-1">
+            <p className="text-[12px] md:text-xs lg:text-sm font-bold text-slate-500  tracking-[0.4em] mt-1">
               CRM Portal
             </p>
           </div> */}
@@ -97,7 +97,7 @@ function LoginPage({ onLogin }) {
             <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-primary tracking-tighter">
               Welcome Back
             </h2>
-            <p className="text-[10px] md:text-xs lg:text-sm text-textMuted font-bold  tracking-widest mt-1">
+            <p className="text-[12px] md:text-xs lg:text-sm text-textMuted font-bold  tracking-widest mt-1">
               Please sign in to your account
             </p>
           </div>
@@ -107,7 +107,7 @@ function LoginPage({ onLogin }) {
             className="space-y-3 md:space-y-3 lg:space-y-4"
           >
             <div className="space-y-1">
-              <label className="text-[9px] md:text-[10px] font-bold text-[#18254D]  tracking-[0.2em] ml-2">
+              <label className="text-[14px] md:text-[12px] font-bold text-[#18254D]  tracking-[0.2em] ml-2">
                 Email ID
               </label>
               <div className="relative group">
@@ -127,7 +127,7 @@ function LoginPage({ onLogin }) {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[9px] md:text-[10px] font-bold text-[#18254D]  tracking-[0.2em] ml-2">
+              <label className="text-[14px] md:text-[12px] font-bold text-[#18254D]  tracking-[0.2em] ml-2">
                 Password
               </label>
               <div className="relative group">
@@ -156,7 +156,7 @@ function LoginPage({ onLogin }) {
             {error && (
               <div className="p-3 md:p-4 bg-error/5 border border-error/10 rounded-xl flex items-center gap-3 text-error animate-fade-in">
                 <AlertCircle size={16} className="shrink-0" />
-                <p className="text-[9px] font-bold tracking-tight leading-tight ">
+                <p className="text-[14px] font-bold tracking-tight leading-tight ">
                   {error}
                 </p>
               </div>
@@ -165,7 +165,7 @@ function LoginPage({ onLogin }) {
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className={`w-full py-3 md:py-3.5 lg:py-4 rounded-xl md:rounded-xl lg:rounded-xl font-bold text-[11px] lg:text-sm  tracking-[0.3em] flex items-center justify-center gap-3 transition-all duration-300 shadow-lg active:scale-[0.97] ${
+              className={`w-full py-3 md:py-3.5 lg:py-4 rounded-xl md:rounded-xl lg:rounded-xl font-bold text-[13px] lg:text-sm  tracking-[0.3em] flex items-center justify-center gap-3 transition-all duration-300 shadow-lg active:scale-[0.97] ${
                 isFormValid && !isLoading
                   ? "bg-[#18254D] text-white hover:bg-[#62a33a] hover:scale-[1.02] hover:shadow-xl hover:-translate-y-0.5"
                   : "bg-slate-200 text-slate-400 cursor-not-allowed"
@@ -186,7 +186,7 @@ function LoginPage({ onLogin }) {
           </form>
         </div>
 
-        <p className="text-center mt-10 md:mb-2 text-[10px] lg:text-xs font-bold text-slate-400  tracking-widest opacity-60">
+        <p className="text-center mt-10 md:mb-2 text-[12px] lg:text-xs font-bold text-slate-400  tracking-widest opacity-60">
           © Copyright 2026 Parivartan. All Rights Reserved.
         </p>
       </div>

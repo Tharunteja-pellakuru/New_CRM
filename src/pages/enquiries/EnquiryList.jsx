@@ -432,7 +432,7 @@ const EnquiryList = ({
           <div className="w-full lg:w-auto">
             <button
               onClick={() => setShowSimulateForm(true)}
-              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold  tracking-wider shadow-lg active:scale-95 group"
+              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[13px] font-bold  tracking-wider shadow-lg active:scale-95 group"
             >
               <Plus
                 size={16}
@@ -481,7 +481,7 @@ const EnquiryList = ({
                 {/* AI Analysis Toggle */}
                 <div className="min-w-[140px] flex-1 shrink-0 flex items-center justify-between px-3 h-[38px] bg-slate-50 border border-slate-200 rounded-xl">
                   <span
-                    className={`text-[10px] font-bold uppercase ${aiAnalysisEnabled ? "text-primary" : "text-slate-400"}`}
+                    className={`text-[12px] font-bold uppercase ${aiAnalysisEnabled ? "text-primary" : "text-slate-400"}`}
                   >
                     AI Analysis
                   </span>
@@ -509,7 +509,7 @@ const EnquiryList = ({
                 {/* Filter Spam Toggle */}
                 <div className="min-w-[140px] flex-1 shrink-0 flex items-center justify-between px-3 h-[38px] bg-slate-50 border border-slate-200 rounded-xl">
                   <span
-                    className={`text-[10px] font-bold uppercase ${hideIrrelevant ? "text-primary" : "text-slate-400"}`}
+                    className={`text-[12px] font-bold uppercase ${hideIrrelevant ? "text-primary" : "text-slate-400"}`}
                   >
                     Filter Spam
                   </span>
@@ -538,9 +538,9 @@ const EnquiryList = ({
                       onClick={() =>
                         setIsModelDropdownOpen(!isModelDropdownOpen)
                       }
-                      className="w-full h-[38px] flex items-center justify-between gap-3 px-3 bg-white border border-slate-200 rounded-xl text-[10px] font-bold tracking-widest text-[#18254D] hover:bg-slate-50 transition-all shadow-sm active:scale-95 group"
+                      className="w-full h-[38px] flex items-center justify-between gap-3 px-3 bg-white border border-slate-200 rounded-xl text-[12px] font-bold tracking-widest text-[#18254D] hover:bg-slate-50 transition-all shadow-sm active:scale-95 group"
                     >
-                      <span className="truncate text-[10px] uppercase tracking-tight">
+                      <span className="truncate text-[12px] uppercase tracking-tight">
                         {aiModels.find((m) => m.id === selectedAiModel)?.name ||
                           "AI Model"}
                       </span>
@@ -570,10 +570,10 @@ const EnquiryList = ({
                                   }}
                                   className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex flex-col gap-0.5 ${selectedAiModel === model.id ? "bg-slate-50" : ""}`}
                                 >
-                                  <span className="text-[10px] font-bold text-primary">
+                                  <span className="text-[12px] font-bold text-primary">
                                     {model.name}
                                   </span>
-                                  <span className="text-[8px] text-slate-400 truncate">
+                                  <span className="text-[13px] text-slate-400 truncate">
                                     {model.description}
                                   </span>
                                 </button>
@@ -610,7 +610,7 @@ const EnquiryList = ({
           <div className="mt-4 flex justify-center">
             <div className="px-5 py-1.5 bg-slate-50 border border-slate-100 rounded-full shadow-sm flex items-center gap-3 animate-fade-in group">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black  tracking-widest text-slate-400">
+                <span className="text-[12px] font-black  tracking-widest text-slate-400">
                   Analysis
                 </span>
                 {isAnalyzing && (
@@ -622,17 +622,17 @@ const EnquiryList = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black  tracking-widest text-primary">
+                <span className="text-[13px] font-black  tracking-widest text-primary">
                   {analyzedInTabCount} of {totalInTabCount}
                 </span>
-                <span className="text-[10px] font-black  tracking-widest text-slate-400">
+                <span className="text-[12px] font-black  tracking-widest text-slate-400">
                   Completed
                 </span>
               </div>
               {hideIrrelevant && spamFilteredCount > 0 && (
                 <>
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-200 mx-1" />
-                  <span className="text-[10px] font-black  tracking-widest text-secondary/60">
+                  <span className="text-[12px] font-black  tracking-widest text-secondary/60">
                     {spamFilteredCount} Filtered
                   </span>
                 </>
@@ -667,7 +667,7 @@ const EnquiryList = ({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
+                className={`px-5 h-full rounded-xl text-[12px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
                   activeTab === tab
                     ? `${activeColor} shadow-md`
                     : `text-slate-400 ${hoverColor}`
@@ -688,7 +688,7 @@ const EnquiryList = ({
         {paginatedEnquiries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 bg-white rounded-3xl border border-slate-200 shadow-sm w-full">
             <Inbox size={22} className="text-slate-200 mb-2" />
-            <p className="text-[10px] font-bold text-slate-300  tracking-widest">
+            <p className="text-[12px] font-bold text-slate-300  tracking-widest">
               No enquiries
             </p>
           </div>
@@ -716,7 +716,7 @@ const EnquiryList = ({
                     <h3 className="text-base font-bold text-[#18254D] tracking-tight">
                       {enquiry.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-1.5 text-[14px] text-slate-400 font-bold uppercase tracking-widest">
                       <Clock size={10} className="opacity-70" />
                       {new Date(enquiry.date).toLocaleDateString([], {
                         month: "short",
@@ -740,7 +740,7 @@ const EnquiryList = ({
                       ) : (
                         <ShieldAlert size={10} className="text-rose-500" />
                       )}
-                      <span className="text-[8px] font-black uppercase tracking-widest">
+                      <span className="text-[13px] font-black uppercase tracking-widest">
                         {enquiry.aiAnalysis.isRelevant
                           ? "Relevant"
                           : "Spam/Irr"}
@@ -748,7 +748,7 @@ const EnquiryList = ({
                       {enquiry.aiAnalysis.leadScore !== undefined && (
                         <>
                           <div className="w-px h-2 bg-current opacity-20" />
-                          <span className="text-[8px] font-black">
+                          <span className="text-[13px] font-black">
                             {enquiry.aiAnalysis.leadScore}
                           </span>
                         </>
@@ -759,7 +759,7 @@ const EnquiryList = ({
                   {activeTab === "hold" && (
                     <div className="px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-full flex items-center gap-1.5">
                       <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.1em] text-amber-600">
+                      <span className="text-[13px] font-black uppercase tracking-[0.1em] text-amber-600">
                         Reason Logged
                       </span>
                     </div>
@@ -775,7 +775,7 @@ const EnquiryList = ({
                     <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shadow-sm border border-slate-100 group-hover/info:scale-110 transition-transform">
                       <Mail size={12} className="text-slate-400" />
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-500 truncate">
+                    <span className="text-[13px] font-semibold text-slate-500 truncate">
                       {enquiry.email}
                     </span>
                   </div>
@@ -783,7 +783,7 @@ const EnquiryList = ({
                     <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shadow-sm border border-slate-100 group-hover/info:scale-110 transition-transform">
                       <Phone size={12} className="text-slate-400" />
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-500 truncate">
+                    <span className="text-[13px] font-semibold text-slate-500 truncate">
                       {enquiry.phone || "Not Provided"}
                     </span>
                   </div>
@@ -791,7 +791,7 @@ const EnquiryList = ({
                     <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shadow-sm border border-slate-100 group-hover/info:scale-110 transition-transform">
                       <Globe size={12} className="text-slate-400" />
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-500 truncate">
+                    <span className="text-[13px] font-semibold text-slate-500 truncate">
                       {enquiry.website || "Direct"}
                     </span>
                   </div>
@@ -806,12 +806,12 @@ const EnquiryList = ({
                   {activeTab === "hold" && enquiry.holdReason && (
                     <div className="mt-1 space-y-1.5 border-t border-slate-100 pt-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">
+                        <span className="text-[13px] font-black text-slate-300 uppercase tracking-widest">
                           Hold Reason
                         </span>
                       </div>
                       <div className="p-3 bg-amber-50/50 border border-amber-100/50 rounded-xl">
-                        <p className="text-[11px] font-bold text-amber-600 leading-relaxed italic">
+                        <p className="text-[13px] font-bold text-amber-600 leading-relaxed italic">
                           {enquiry.holdReason}
                         </p>
                       </div>
@@ -827,7 +827,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => openLeadModal(enquiry)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all active:scale-95"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[14px] font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all active:scale-95"
                     >
                       <CheckCircle size={14} strokeWidth={2.5} />
                       Add to Lead
@@ -835,7 +835,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => openHoldModal(enquiry)}
-                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-amber-50 hover:text-amber-500 hover:border-amber-200 transition-all font-bold tracking-wider text-[9px] uppercase group/hold"
+                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-amber-50 hover:text-amber-500 hover:border-amber-200 transition-all font-bold tracking-wider text-[14px] uppercase group/hold"
                     >
                       <PauseCircle
                         size={16}
@@ -846,7 +846,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => onDismiss(enquiry.id)}
-                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all font-bold tracking-wider text-[9px] uppercase group/dismiss"
+                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all font-bold tracking-wider text-[14px] uppercase group/dismiss"
                     >
                       <X
                         size={16}
@@ -860,7 +860,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => onRestore(enquiry.id)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[14px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
                     >
                       <RefreshCcw size={14} strokeWidth={2.5} />
                       Restore Enquiry
@@ -868,7 +868,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => onDismiss(enquiry.id)}
-                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all font-bold tracking-wider text-[9px] uppercase group/dismiss"
+                      className="h-9 px-4 flex items-center gap-2 text-slate-400 border border-slate-200 rounded-full hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all font-bold tracking-wider text-[14px] uppercase group/dismiss"
                     >
                       <X
                         size={16}
@@ -882,7 +882,7 @@ const EnquiryList = ({
                     <button
                       type="button"
                       onClick={() => onRestore(enquiry.id)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#18254D] text-white rounded-full text-[14px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
                     >
                       <RefreshCcw size={14} strokeWidth={2.5} />
                       Restore Enquiry
@@ -917,14 +917,14 @@ const EnquiryList = ({
               <h3 className="text-2xl font-bold tracking-tight mb-1">
                 New Enquiry
               </h3>
-              <p className="text-slate-400 text-[11px] font-bold  tracking-widest">
+              <p className="text-slate-400 text-[13px] font-bold  tracking-widest">
                 Manual Entry
               </p>
             </div>
             <form onSubmit={handleSimulateSubmit} className="p-7 space-y-5">
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Full Name
                   </label>
                   <input
@@ -940,7 +940,7 @@ const EnquiryList = ({
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                       Email
                     </label>
                     <input
@@ -955,7 +955,7 @@ const EnquiryList = ({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                       Phone
                     </label>
                     <input
@@ -970,7 +970,7 @@ const EnquiryList = ({
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Website URL (Optional)
                   </label>
                   <input
@@ -984,7 +984,7 @@ const EnquiryList = ({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Requirement Briefing
                   </label>
                   <textarea
@@ -1002,7 +1002,7 @@ const EnquiryList = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full h-14 bg-[#18254D] text-white rounded-2xl text-[11px] font-bold  tracking-widest shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
+                  className="w-full h-14 bg-[#18254D] text-white rounded-2xl text-[13px] font-bold  tracking-widest shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
                 >
                   <span>Add Enquiry</span>
                   <Send
@@ -1038,7 +1038,7 @@ const EnquiryList = ({
             <div className="p-5 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1">
                     Full Name
                   </label>
                   <input
@@ -1054,7 +1054,7 @@ const EnquiryList = ({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1">
                     Email ID
                   </label>
                   <input
@@ -1083,7 +1083,7 @@ const EnquiryList = ({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1 uppercase">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1 uppercase">
                     Phone Number
                   </label>
                   <input
@@ -1099,7 +1099,7 @@ const EnquiryList = ({
                   />
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1 uppercase">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1 uppercase">
                     Website URL (Optional)
                   </label>
                   <input
@@ -1117,7 +1117,7 @@ const EnquiryList = ({
               </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1 uppercase">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1 uppercase">
                     Lead Category
                   </label>
                   <div className="relative">
@@ -1147,7 +1147,7 @@ const EnquiryList = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Category
                             </p>
                           </div>
@@ -1159,7 +1159,7 @@ const EnquiryList = ({
                                 setPromoteFormData({ ...promoteFormData, leadCategory: catId });
                                 setIsEnquiryCategoryDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 promoteFormData.leadCategory === catId
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -1175,7 +1175,7 @@ const EnquiryList = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-primary  tracking-widest ml-1 uppercase">
+                  <label className="text-[14px] font-bold text-primary  tracking-widest ml-1 uppercase">
                     Lead Status
                   </label>
                   <div className="relative">
@@ -1205,7 +1205,7 @@ const EnquiryList = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Status
                             </p>
                           </div>
@@ -1217,7 +1217,7 @@ const EnquiryList = ({
                                 setPromoteFormData({ ...promoteFormData, leadType: status });
                                 setIsEnquiryStatusDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 promoteFormData.leadType === status
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -1239,7 +1239,7 @@ const EnquiryList = ({
                 </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-bold text-primary  tracking-widest ml-1">
+                <label className="text-[14px] font-bold text-primary  tracking-widest ml-1">
                   Note
                 </label>
                 <textarea
@@ -1258,7 +1258,7 @@ const EnquiryList = ({
               <button
                 type="button"
                 onClick={confirmLeadConversion}
-                className="w-full py-3.5 bg-[#18254D] text-white rounded-2xl text-[11px] font-bold  tracking-widest shadow-lg active:scale-[0.98] transition-all hover:bg-slate-800"
+                className="w-full py-3.5 bg-[#18254D] text-white rounded-2xl text-[13px] font-bold  tracking-widest shadow-lg active:scale-[0.98] transition-all hover:bg-slate-800"
               >
                 Add Lead
               </button>
@@ -1298,7 +1298,7 @@ const EnquiryList = ({
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${
+                  className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-[12px] font-black transition-all ${
                     currentPage === pageNum
                       ? "bg-[#18254D] text-white shadow-lg shadow-slate-300 scale-110"
                       : "text-slate-400 hover:text-primary hover:bg-white"
@@ -1337,7 +1337,7 @@ const EnquiryList = ({
             <div className="p-7 space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Hold Reason
                   </label>
                   <textarea

@@ -134,7 +134,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
             handleDateSelect(d);
           }}
           type="button"
-          className={`h-7 w-7 flex items-center justify-center rounded-lg text-[10px] font-bold transition-all ${
+          className={`h-7 w-7 flex items-center justify-center rounded-lg text-[12px] font-bold transition-all ${
             isSelected
               ? "bg-[#18254D] text-white shadow-md shadow-[#18254D]/20 scale-110"
               : isTodayDate
@@ -180,7 +180,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
               e.stopPropagation();
               setCurrentMonth(new Date(y, currentMonth.getMonth(), 1));
             }}
-            className={`w-full text-left px-3 py-2 text-[10px] font-bold transition-all ${
+            className={`w-full text-left px-3 py-2 text-[12px] font-bold transition-all ${
               isExpanded
                 ? "bg-slate-50 text-[#18254D]"
                 : "text-slate-400 hover:bg-slate-50 hover:text-[#18254D]"
@@ -199,7 +199,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
                     setCurrentMonth(new Date(y, idx, 1));
                     setView("days");
                   }}
-                  className={`py-2 rounded-lg text-[9px] font-bold transition-all ${
+                  className={`py-2 rounded-lg text-[14px] font-bold transition-all ${
                     currentMonth.getMonth() === idx
                       ? "bg-[#18254D] text-white shadow-md shadow-[#18254D]/20"
                       : "text-slate-500 hover:bg-slate-50 hover:text-[#18254D]"
@@ -226,7 +226,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`datepicker-trigger w-full h-[38px] grid ${label ? "grid-cols-[auto_1fr_auto]" : "grid-cols-[1fr_auto]"} items-center gap-2 px-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-[#18254D] focus:outline-none focus:ring-4 focus:ring-[#18254D]/10 hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50`}
+        className={`datepicker-trigger w-full h-[38px] grid ${label ? "grid-cols-[auto_1fr_auto]" : "grid-cols-[1fr_auto]"} items-center gap-2 px-3 bg-slate-50 border border-slate-100 rounded-xl text-[12px] font-bold text-[#18254D] focus:outline-none focus:ring-4 focus:ring-[#18254D]/10 hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50`}
       >
         {label && (
           <div className="flex items-center justify-start min-w-[35px]">
@@ -281,7 +281,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
                 }}
                 className="flex items-center gap-1 px-2 py-1 hover:bg-slate-50 rounded-lg transition-colors group"
               >
-                <span className="text-[11px] font-bold text-[#18254D] tracking-wide">
+                <span className="text-[13px] font-bold text-[#18254D] tracking-wide">
                   {currentMonth.toLocaleString("default", {
                     month: "long",
                     year: "numeric",
@@ -307,7 +307,7 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
                   {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
                     <div
                       key={day}
-                      className="text-center text-[9px] font-bold text-slate-400 uppercase"
+                      className="text-center text-[14px] font-bold text-slate-400 uppercase"
                     >
                       {day}
                     </div>
@@ -323,14 +323,14 @@ const DatePicker = ({ label, value, onChange, placeholder }) => {
               <button
                 type="button"
                 onClick={handleClear}
-                className="text-[10px] font-bold text-slate-400 hover:text-error transition-colors px-2 py-1"
+                className="text-[12px] font-bold text-slate-400 hover:text-error transition-colors px-2 py-1"
               >
                 Clear
               </button>
               <button
                 type="button"
                 onClick={handleToday}
-                className="text-[10px] font-bold text-[#18254D] hover:bg-slate-50 px-2 py-1 rounded-lg transition-colors"
+                className="text-[12px] font-bold text-[#18254D] hover:bg-slate-50 px-2 py-1 rounded-lg transition-colors"
               >
                 Today
               </button>

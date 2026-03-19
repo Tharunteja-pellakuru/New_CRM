@@ -7,6 +7,7 @@ import {
   Mail,
   Phone,
   ChevronRight,
+  ChevronLeft,
   Flame,
   Sun,
   Snowflake,
@@ -119,6 +120,8 @@ const ClientList = ({
   }, [isTierDropdownOpen, isCategoryDropdownOpen]);
 
   const [startDate, setStartDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const RECORDS_PER_PAGE = 10;
   const [endDate, setEndDate] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showOnboardModal, setShowOnboardModal] = useState(false);
@@ -255,6 +258,12 @@ const ClientList = ({
 
     return matchesSearch && matchesStatus && matchesLeadType && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredClients.length / RECORDS_PER_PAGE);
+  const currentClients = filteredClients.slice(
+    (currentPage - 1) * RECORDS_PER_PAGE,
+    currentPage * RECORDS_PER_PAGE
+  );
 
   const getStatusBadge = (client) => {
     if (client.status === "Lead" && client.leadType) {
@@ -393,7 +402,7 @@ const ClientList = ({
           <div className="w-full lg:w-auto">
             {/* <button
               onClick={() => setShowAddModal(true)}
-              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold  tracking-wider shadow-lg active:scale-95 group"
+              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[13px] font-bold  tracking-wider shadow-lg active:scale-95 group"
             >
               <Plus
                 size={16}
@@ -428,7 +437,7 @@ const ClientList = ({
                 <button
                   ref={tierButtonRef}
                   onClick={() => setIsTierDropdownOpen(!isTierDropdownOpen)}
-                  className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
+                  className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[12px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
                 >
                   <span>
                     {leadTypeFilter === "All"
@@ -460,7 +469,7 @@ const ClientList = ({
                               setLeadTypeFilter(tier);
                               setIsTierDropdownOpen(false);
                             }}
-                            className={`w-full text-left px-5 py-4 text-[10px] font-bold  tracking-wider transition-colors ${
+                            className={`w-full text-left px-5 py-4 text-[12px] font-bold  tracking-wider transition-colors ${
                               tier === "All"
                                 ? "bg-[#18254D] text-white"
                                 : leadTypeFilter === tier
@@ -485,7 +494,7 @@ const ClientList = ({
                 onClick={() =>
                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
                 }
-                className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
+                className="w-full h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[12px] font-bold  tracking-widest text-[#18254D] hover:bg-white hover:border-slate-200 transition-all shadow-sm shadow-slate-200/50 group"
               >
                 <span>
                   {categoryFilter === "All"
@@ -517,7 +526,7 @@ const ClientList = ({
                             setCategoryFilter(catId);
                             setIsCategoryDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-wider transition-colors ${
+                          className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-wider transition-colors ${
                             catId === "All"
                               ? categoryFilter === "All"
                                 ? "bg-[#18254D] text-white"
@@ -579,7 +588,7 @@ const ClientList = ({
                   <button
                     key={view}
                     onClick={() => setLeadView(view)}
-                    className={`px-5 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
+                    className={`px-5 h-full rounded-xl text-[12px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[100px] border border-transparent whitespace-nowrap ${
                       leadView === view
                         ? `${activeColor} shadow-md`
                         : `text-slate-400 ${hoverColor}`
@@ -599,25 +608,25 @@ const ClientList = ({
             <table className="w-full min-w-[1000px] border-collapse">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
+                  <th className="px-6 py-4 text-left text-[12px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Client Name
                   </th>
-                  <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
+                  <th className="px-6 py-4 text-left text-[12px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Contact Details
                   </th>
-                  <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
+                  <th className="px-6 py-4 text-left text-[12px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Client Category
                   </th>
-                  <th className="px-6 py-4 text-center text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
+                  <th className="px-6 py-4 text-center text-[12px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
+                  <th className="px-6 py-4 text-right text-[12px] font-bold text-slate-400  tracking-widest border-b border-slate-100">
                     Control
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredClients.map((client) => {
+                {currentClients.map((client) => {
                   const status = getStatusBadge(client);
                   return (
                     <tr
@@ -647,7 +656,7 @@ const ClientList = ({
                           </div>
                           <div className="flex items-center gap-2 text-slate-400 mt-1">
                             <Mail size={12} />
-                            <span className="text-[10px] font-bold truncate max-w-[150px]">
+                            <span className="text-[12px] font-bold truncate max-w-[150px]">
                               {client.email || "N/A"}
                             </span>
                           </div>
@@ -670,7 +679,7 @@ const ClientList = ({
                           {client.status === "Lead" ? (
                             <div className="flex flex-col items-center w-full">
                               <span
-                                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold border  flex items-center gap-2 shadow-sm transition-all ${status.className}`}
+                                className={`px-4 py-1.5 rounded-xl text-[12px] font-bold border  flex items-center gap-2 shadow-sm transition-all ${status.className}`}
                               >
                                 {status.icon}
                                 {status.label}
@@ -679,7 +688,7 @@ const ClientList = ({
                           ) : (
                             <div className="flex flex-col items-center w-full">
                               <span
-                                className={`px-3 py-1 rounded-lg text-[10px] font-bold  tracking-widest ${client.status === "Active" ? "bg-success/10 text-success border border-success/20" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
+                                className={`px-3 py-1 rounded-lg text-[12px] font-bold  tracking-widest ${client.status === "Active" ? "bg-success/10 text-success border border-success/20" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
                               >
                                 {client.status || "Active"}
                               </span>
@@ -785,7 +794,7 @@ const ClientList = ({
                       <div className="w-14 h-14 bg-slate-50 text-slate-200 p-4 rounded-xl mb-4 shadow-inner flex items-center justify-center mx-auto">
                         <Search size={32} />
                       </div>
-                      <p className="text-[11px] font-bold text-primary  tracking-[0.4em]">
+                      <p className="text-[13px] font-bold text-primary  tracking-[0.4em]">
                         Zero Results
                       </p>
                       <p className="text-sm font-medium text-slate-400 mt-2">
@@ -801,7 +810,7 @@ const ClientList = ({
 
         {/* Mobile Card List View */}
         <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredClients.map((client) => {
+          {currentClients.map((client) => {
             const status = getStatusBadge(client);
             return (
               <div
@@ -822,7 +831,7 @@ const ClientList = ({
                         <div
                           className={`w-1.5 h-1.5 rounded-full ${client.projectCategory === 1 ? "bg-secondary" : client.projectCategory === 2 ? "bg-blue-400" : client.projectCategory === 3 ? "bg-purple-400" : "bg-slate-300"}`}
                         />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">
                           {CATEGORY_MAP[client.projectCategory] ||
                             client.industry ||
                             "Other"}
@@ -831,7 +840,7 @@ const ClientList = ({
                     </div>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-lg text-[9px] font-bold border flex items-center gap-1.5 shadow-sm ${status.className}`}
+                    className={`px-3 py-1 rounded-lg text-[14px] font-bold border flex items-center gap-1.5 shadow-sm ${status.className}`}
                   >
                     {status.icon}
                     {status.label}
@@ -878,7 +887,7 @@ const ClientList = ({
                         e.stopPropagation();
                         onSelectClient(client);
                       }}
-                      className="flex items-center gap-1 text-[10px] font-bold text-secondary uppercase tracking-widest hover:text-secondary/80 transition-colors"
+                      className="flex items-center gap-1 text-[12px] font-bold text-secondary uppercase tracking-widest hover:text-secondary/80 transition-colors"
                     >
                       View Details
                       <ChevronRight size={14} />
@@ -954,6 +963,59 @@ const ClientList = ({
             </div>
           )}
         </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8 mb-4">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-primary hover:border-primary disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-400 transition-all shadow-sm active:scale-95"
+          >
+            <ChevronLeft size={16} strokeWidth={2.5} />
+          </button>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-2xl shadow-inner mx-2">
+            {[...Array(totalPages)].map((_, i) => {
+              const pageNum = i + 1;
+              if (
+                totalPages > 7 &&
+                pageNum !== 1 &&
+                pageNum !== totalPages &&
+                Math.abs(pageNum - currentPage) > 1
+              ) {
+                if (pageNum === 2 || pageNum === totalPages - 1) {
+                  return <span key={pageNum} className="text-slate-300 px-1 font-bold">.</span>;
+                }
+                return null;
+              }
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-sm font-black transition-all ${
+                    currentPage === pageNum
+                      ? "bg-[#18254D] text-white shadow-lg shadow-slate-300 scale-110"
+                      : "text-slate-400 hover:text-primary hover:bg-white"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-primary hover:border-primary disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-400 transition-all shadow-sm active:scale-95"
+          >
+            <ChevronRight size={16} strokeWidth={2.5} />
+          </button>
+        </div>
+      )}
+
       </div>
 
       {/* Add Modal */}
@@ -979,7 +1041,7 @@ const ClientList = ({
                   <h3 className="text-base font-bold tracking-tighter leading-none">
                     New {title === "Leads" ? "Lead" : "Client"}
                   </h3>
-                  <p className="text-slate-400 text-[9px] font-bold  tracking-widest mt-0.5">
+                  <p className="text-slate-400 text-[14px] font-bold  tracking-widest mt-0.5">
                     {title === "Leads" ? "Lead Details" : "Client Details"}
                   </p>
                 </div>
@@ -994,7 +1056,7 @@ const ClientList = ({
                 /* ADD LEAD FIELDS */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       CLIENT NAME
                     </label>
                     <input
@@ -1010,7 +1072,7 @@ const ClientList = ({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       EMAIL ID
                     </label>
                     <input
@@ -1026,7 +1088,7 @@ const ClientList = ({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       PHONE NUMBER
                     </label>
                     <input
@@ -1042,7 +1104,7 @@ const ClientList = ({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       WEBSITE URL
                     </label>
                     <input
@@ -1057,7 +1119,7 @@ const ClientList = ({
                   </div>
 
                   <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       LEAD CATEGORY
                     </label>
                     <div className="flex gap-2">
@@ -1068,7 +1130,7 @@ const ClientList = ({
                           onClick={() =>
                             setFormData({ ...formData, projectCategory: catId })
                           }
-                          className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
+                          className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[12px] tracking-widest ${
                             formData.projectCategory === catId
                               ? "border-primary bg-primary/5 text-primary shadow-sm"
                               : "border-slate-100 text-slate-400 hover:border-slate-200"
@@ -1081,7 +1143,7 @@ const ClientList = ({
                   </div>
 
                   <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       LEAD STATUS
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1112,7 +1174,7 @@ const ClientList = ({
                           ) : (
                             <Snowflake size={14} strokeWidth={2.5} />
                           )}
-                          <span className="text-[8px] font-bold  tracking-widest">
+                          <span className="text-[13px] font-bold  tracking-widest">
                             {type}
                           </span>
                         </button>
@@ -1121,7 +1183,7 @@ const ClientList = ({
                   </div>
 
                   <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       NOTE
                     </label>
                     <textarea
@@ -1145,7 +1207,7 @@ const ClientList = ({
                   {/* CLIENT DETAILS HEADING */}
                   <div className="flex items-center gap-2 pt-1">
                     <div className="h-[2px] w-6 bg-secondary rounded-full" />
-                    <h4 className="text-[11px] font-bold text-[#18254D]  tracking-[0.2em]">
+                    <h4 className="text-[13px] font-bold text-[#18254D]  tracking-[0.2em]">
                       Client Details
                     </h4>
                     <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
@@ -1153,7 +1215,7 @@ const ClientList = ({
 
                   {/* CLIENT TYPE */}
                   <div className="space-y-2 pb-1">
-                    <label className="text-[9px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[14px] font-bold text-[#18254D]  tracking-widest ml-1">
                       CLIENT TYPE
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1173,7 +1235,7 @@ const ClientList = ({
                           <p className="text-xs font-bold text-[#18254D] leading-none">
                             New Client
                           </p>
-                          <p className="text-[8px] text-slate-400 font-bold mt-0.5">
+                          <p className="text-[13px] text-slate-400 font-bold mt-0.5">
                             First-time engagement
                           </p>
                         </div>
@@ -1185,7 +1247,7 @@ const ClientList = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* NAME & EMAIL */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         CLIENT NAME
                       </label>
                       <input
@@ -1201,7 +1263,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         EMAIL ID
                       </label>
                       <input
@@ -1218,7 +1280,7 @@ const ClientList = ({
 
                     {/* PHONE & STATUS */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         PHONE NUMBER
                       </label>
                       <input
@@ -1237,7 +1299,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                         ORGANISATION NAME
                       </label>
                       <input
@@ -1287,7 +1349,7 @@ const ClientList = ({
                       />
                     ) : (
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                        <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                           CLIENT STATE
                         </label>
                         <input
@@ -1319,7 +1381,7 @@ const ClientList = ({
                     />
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                         CLIENT STATUS
                       </label>
                       <select
@@ -1341,7 +1403,7 @@ const ClientList = ({
                   {/* PROJECT DETAILS HEADING */}
                   <div className="flex items-center gap-2 pt-3">
                     <div className="h-[2px] w-6 bg-secondary rounded-full" />
-                    <h4 className="text-[11px] font-bold text-[#18254D]  tracking-[0.2em]">
+                    <h4 className="text-[13px] font-bold text-[#18254D]  tracking-[0.2em]">
                       Project Details
                     </h4>
                     <div className="h-[2px] flex-1 bg-slate-100 rounded-full" />
@@ -1350,7 +1412,7 @@ const ClientList = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* PROJECT NAME & STATUS */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         PROJECT NAME
                       </label>
                       <input
@@ -1369,7 +1431,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         PROJECT STATUS
                       </label>
                       <div className="relative">
@@ -1397,7 +1459,7 @@ const ClientList = ({
                             />
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                               <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                                <p className="text-[14px] font-bold text-white/50  tracking-widest">
                                   Select Status
                                 </p>
                               </div>
@@ -1415,7 +1477,7 @@ const ClientList = ({
                                     });
                                     setIsStatusDropdownOpen(false);
                                   }}
-                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                                  className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                     formData.projectStatus === status
                                       ? "bg-slate-100 text-secondary"
                                       : "text-[#18254D] hover:bg-slate-50"
@@ -1431,7 +1493,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         LEAD CATEGORY
                       </label>
                       <div className="flex gap-2">
@@ -1445,7 +1507,7 @@ const ClientList = ({
                                 projectCategory: catId,
                               })
                             }
-                            className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
+                            className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[12px] tracking-widest ${
                               formData.projectCategory === catId
                                 ? "border-primary bg-primary/5 text-primary shadow-sm"
                                 : "border-slate-100 text-slate-400 hover:border-slate-200"
@@ -1458,7 +1520,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         PROJECT PRIORITY
                       </label>
                       <div className="relative">
@@ -1486,7 +1548,7 @@ const ClientList = ({
                             />
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                               <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                                <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                                <p className="text-[14px] font-bold text-white/50  tracking-widest">
                                   Select Priority
                                 </p>
                               </div>
@@ -1501,7 +1563,7 @@ const ClientList = ({
                                     });
                                     setIsPriorityDropdownOpen(false);
                                   }}
-                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                                  className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                     formData.projectPriority === level
                                       ? "bg-slate-100 text-secondary"
                                       : "text-[#18254D] hover:bg-slate-50"
@@ -1518,7 +1580,7 @@ const ClientList = ({
 
                     {/* PROJECT DESCRIPTION */}
                     <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         PROJECT DESCRIPTION
                       </label>
                       <textarea
@@ -1537,7 +1599,7 @@ const ClientList = ({
 
                     {/* PROJECT BUDGET */}
                     <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 flex items-center gap-1.5">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 flex items-center gap-1.5">
                         PROJECT BUDGET
                       </label>
                       <div className="relative">
@@ -1558,7 +1620,7 @@ const ClientList = ({
 
                     {/* DATES */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         ONBOARDING DATE
                       </label>
                       <DatePicker
@@ -1573,7 +1635,7 @@ const ClientList = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         DEADLINE (TENTATIVE)
                       </label>
                       <DatePicker
@@ -1589,7 +1651,7 @@ const ClientList = ({
 
                     {/* SCOPE DOCUMENT */}
                     <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                      <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                         SCOPE DOCUMENT
                       </label>
                       <div className="relative group">
@@ -1626,7 +1688,7 @@ const ClientList = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-[#18254D] text-white rounded-2xl text-[11px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
+                  className="w-full py-2.5 bg-[#18254D] text-white rounded-2xl text-[13px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
                 >
                   <UserPlus
                     size={20}
@@ -1662,7 +1724,7 @@ const ClientList = ({
                   <h3 className="text-base font-bold tracking-tighter leading-none">
                     Convert to Client
                   </h3>
-                  <p className="text-secondary text-[9px] font-bold  tracking-widest mt-0.5">
+                  <p className="text-secondary text-[14px] font-bold  tracking-widest mt-0.5">
                     Onboard Lead to Active Status
                   </p>
                 </div>
@@ -1681,7 +1743,7 @@ const ClientList = ({
 
               {/* CLIENT TYPE */}
               <div className="space-y-3 pb-2">
-                <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                   CLIENT TYPE
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1718,7 +1780,7 @@ const ClientList = ({
                       <p className="text-sm font-bold text-[#18254D] leading-none">
                         New Client
                       </p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                      <p className="text-[14px] text-slate-400 font-bold mt-1">
                         First-time engagement
                       </p>
                     </div>
@@ -1759,7 +1821,7 @@ const ClientList = ({
                       <p className="text-sm font-bold text-[#18254D] leading-none">
                         Existing Client
                       </p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                      <p className="text-[14px] text-slate-400 font-bold mt-1">
                         Returning or Converted
                       </p>
                     </div>
@@ -1769,7 +1831,7 @@ const ClientList = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2 relative">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     CLIENT NAME
                   </label>
                   <div className="relative">
@@ -1843,7 +1905,7 @@ const ClientList = ({
                                     <p className="text-sm font-bold text-[#18254D] group-hover:text-secondary transition-colors">
                                       {client.name}
                                     </p>
-                                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                                    <p className="text-[12px] text-slate-400 font-bold mt-0.5">
                                       {client.company || client.email}
                                     </p>
                                   </div>
@@ -1885,7 +1947,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     EMAIL ID
                   </label>
                   <input
@@ -1904,7 +1966,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PHONE NUMBER
                   </label>
                   <input
@@ -1923,7 +1985,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                     ORGANISATION NAME
                   </label>
                   <input
@@ -1973,7 +2035,7 @@ const ClientList = ({
                   />
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                       CLIENT STATE
                     </label>
                     <input
@@ -2005,7 +2067,7 @@ const ClientList = ({
                 />
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 uppercase">
                     CLIENT STATUS
                   </label>
                   <select
@@ -2035,7 +2097,7 @@ const ClientList = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT NAME
                   </label>
                   <input
@@ -2054,7 +2116,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT STATUS
                   </label>
                   <div className="relative">
@@ -2084,7 +2146,7 @@ const ClientList = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Status
                             </p>
                           </div>
@@ -2102,7 +2164,7 @@ const ClientList = ({
                                 });
                                 setIsOnboardStatusDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 onboardingData.projectStatus === status
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -2118,7 +2180,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     LEAD CATEGORY
                   </label>
                   <div className="flex gap-2">
@@ -2132,7 +2194,7 @@ const ClientList = ({
                             projectCategory: catId,
                           })
                         }
-                        className={`flex-1 flex items-center justify-center p-3 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
+                        className={`flex-1 flex items-center justify-center p-3 border-2 rounded-xl transition-all font-bold  text-[12px] tracking-widest ${
                           onboardingData.projectCategory === catId
                             ? "border-primary bg-primary/5 text-primary shadow-sm"
                             : "border-slate-100 text-slate-400 hover:border-slate-200"
@@ -2145,7 +2207,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT PRIORITY
                   </label>
                   <div className="relative">
@@ -2177,7 +2239,7 @@ const ClientList = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Priority
                             </p>
                           </div>
@@ -2192,7 +2254,7 @@ const ClientList = ({
                                 });
                                 setIsOnboardPriorityDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 onboardingData.projectPriority === level
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -2208,7 +2270,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT DESCRIPTION
                   </label>
                   <textarea
@@ -2227,7 +2289,7 @@ const ClientList = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       PROJECT BUDGET
                     </label>
                     <div className="relative">
@@ -2249,7 +2311,7 @@ const ClientList = ({
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       ONBOARDING DATE
                     </label>
                     <DatePicker
@@ -2264,7 +2326,7 @@ const ClientList = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                    <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                       DEADLINE (TENTATIVE)
                     </label>
                     <DatePicker
@@ -2280,7 +2342,7 @@ const ClientList = ({
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     SCOPE DOCUMENT
                   </label>
                   <div className="relative group">
@@ -2315,7 +2377,7 @@ const ClientList = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#18254D] text-white rounded-2xl text-[11px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
+                  className="w-full py-3 bg-[#18254D] text-white rounded-2xl text-[13px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
                 >
                   <UserCheck
                     size={20}
@@ -2352,7 +2414,7 @@ const ClientList = ({
                   <h3 className="text-base font-bold tracking-tighter leading-none">
                     Follow Up
                   </h3>
-                  <p className="text-slate-400 text-[9px] font-bold  tracking-widest mt-0.5">
+                  <p className="text-slate-400 text-[14px] font-bold  tracking-widest mt-0.5">
                     {followUpLeadName}
                   </p>
                 </div>
@@ -2385,7 +2447,7 @@ const ClientList = ({
             >
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Date
                   </label>
                   <DatePicker
@@ -2399,7 +2461,7 @@ const ClientList = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                     Time
                   </label>
                   <div className="relative">
@@ -2420,7 +2482,7 @@ const ClientList = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                   Interaction Type
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -2434,7 +2496,7 @@ const ClientList = ({
                           type: type,
                         })
                       }
-                      className={`py-2.5 px-3 rounded-xl border text-[10px] font-bold  tracking-widest transition-all ${
+                      className={`py-2.5 px-3 rounded-xl border text-[12px] font-bold  tracking-widest transition-all ${
                         followUpData.type === type
                           ? "bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-200"
                           : "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
@@ -2447,7 +2509,7 @@ const ClientList = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-primary  tracking-widest ml-1">
+                <label className="text-[12px] font-bold text-primary  tracking-widest ml-1">
                   Follow Up Message
                 </label>
                 <textarea
@@ -2467,7 +2529,7 @@ const ClientList = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-primary text-white rounded-2xl hover:bg-slate-800 text-[11px] font-bold  tracking-[0.3em] transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full py-3 bg-primary text-white rounded-2xl hover:bg-slate-800 text-[13px] font-bold  tracking-[0.3em] transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3"
                 >
                   <MessageSquare size={18} />
                   Save & View Conversations

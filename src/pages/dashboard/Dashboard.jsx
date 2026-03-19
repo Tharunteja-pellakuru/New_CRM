@@ -12,18 +12,18 @@ function StatCard({ title, value, trend, trendUp, icon, description }) {
           {icon}
         </div>
         {trend && (
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${trendUp ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+          <span className={`text-[12px] font-bold px-2 py-0.5 rounded-full ${trendUp ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
             {trend}
           </span>
         )}
       </div>
-      <h3 className="text-textMuted text-[11px] font-semibold tracking-wider">{title}</h3>
+      <h3 className="text-textMuted text-[13px] font-semibold tracking-wider">{title}</h3>
       <p className="text-2xl sm:text-3xl font-bold text-primary mt-1.5">{value}</p>
       
       {description && (
         <div className="absolute bottom-4 right-4 group/info">
           <Info size={14} className="text-slate-300 hover:text-primary cursor-help" />
-          <div className="absolute bottom-full right-0 mb-2 w-48 p-2.5 bg-[#18254D] text-white text-[10px] rounded-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all">
+          <div className="absolute bottom-full right-0 mb-2 w-48 p-2.5 bg-[#18254D] text-white text-[12px] rounded-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all">
             {description}
           </div>
         </div>
@@ -139,7 +139,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                 <div className="relative">
                   <Bell size={18} strokeWidth={2.5} />
                   {totalNotifications > 0 && !showNotifications && (
-                    <span className="bg-[#18254D] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg absolute -top-1.5 -right-1.5 border border-white">
+                    <span className="bg-[#18254D] text-white text-[12px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg absolute -top-1.5 -right-1.5 border border-white">
                       {totalNotifications}
                     </span>
                   )}
@@ -154,14 +154,14 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                   <div className="fixed lg:absolute left-1/2 md:left-auto lg:right-0 -translate-x-1/2 lg:translate-x-0 mt-3 w-[280px] bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/40 overflow-hidden animate-pop z-[100] top-24 lg:top-auto">
                     <div className="p-4 pb-2 border-b border-black/5 bg-black/5">
                       <div className="flex justify-between items-center mb-1">
-                        <h3 className="text-[10px] font-bold text-primary  tracking-widest capitalize">
+                        <h3 className="text-[12px] font-bold text-primary  tracking-widest capitalize">
                           New Enquiries
                         </h3>
                         <div className="flex items-center gap-2">
                           {newEnquiries.length > 0 && (
                             <button
                               onClick={onClearNotifications}
-                              className="text-[9px] font-bold text-primary hover:text-white hover:bg-primary px-2.5 py-1.5 rounded-lg border border-primary/10 hover:border-primary tracking-widest transition-all active:scale-95 whitespace-nowrap shadow-sm"
+                              className="text-[14px] font-bold text-primary hover:text-white hover:bg-primary px-2.5 py-1.5 rounded-lg border border-primary/10 hover:border-primary tracking-widest transition-all active:scale-95 whitespace-nowrap shadow-sm"
                             >
                               Clear All
                             </button>
@@ -178,7 +178,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                     <div className="max-h-[300px] overflow-y-auto p-2.5 no-scrollbar space-y-1.5">
                       {newEnquiries.length === 0 ? (
                         <div className="text-center py-8">
-                          <p className="text-[10px] text-slate-400 font-bold  tracking-widest">
+                          <p className="text-[12px] text-slate-400 font-bold  tracking-widest">
                             No new enquiries
                           </p>
                         </div>
@@ -197,10 +197,10 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                                 {new Date(e.date).toLocaleDateString()}
                               </span>
                             </div>
-                            <p className="text-[11px] font-bold text-primary truncate">
+                            <p className="text-[13px] font-bold text-primary truncate">
                               {e.name}
                             </p>
-                            <p className="text-[9px] text-slate-400 truncate mt-0.5">
+                            <p className="text-[14px] text-slate-400 truncate mt-0.5">
                               {e.message}
                             </p>
                           </div>
@@ -217,7 +217,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                 <p className="text-xs font-bold text-primary leading-none">
                   {currentUser?.full_name?.split(' ')[0] || 'Admin'}
                 </p>
-                <p className="text-[9px] font-bold text-secondary  tracking-widest mt-0.5">
+                <p className="text-[14px] font-bold text-secondary  tracking-widest mt-0.5">
                   {currentUser?.role || 'Admin'}
                 </p>
               </div>
@@ -285,7 +285,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                     setViewAllTab("Today");
                     setShowViewAllModal(true);
                   }}
-                  className="text-[10px] text-primary font-bold tracking-wider bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 hover:bg-slate-100 hover:border-slate-200 transition-all"
+                  className="text-[12px] text-primary font-bold tracking-wider bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 hover:bg-slate-100 hover:border-slate-200 transition-all"
                 >
                   View All
                 </button>
@@ -294,7 +294,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                 {todayTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <CheckCircle2 size={24} className="text-slate-200 mb-3" />
-                    <p className="text-[10px] font-bold text-slate-300  tracking-widest">
+                    <p className="text-[12px] font-bold text-slate-300  tracking-widest">
                       All Caught Up
                     </p>
                   </div>
@@ -312,13 +312,13 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                         <div className="flex justify-between items-start mb-2.5">
                           <div className="flex gap-1.5 flex-wrap">
                             <span
-                              className={`px-2 py-0.5 rounded-lg text-[8px] font-bold tracking-widest ${f.priority === "High" ? "bg-error/10 text-error" : "bg-info/10 text-info"}`}
+                              className={`px-2 py-0.5 rounded-lg text-[13px] font-bold tracking-widest ${f.priority === "High" ? "bg-error/10 text-error" : "bg-info/10 text-info"}`}
                             >
                               {f.priority}
                             </span>
                             {client && (
                               <span
-                                className={`px-2 py-0.5 rounded-lg text-[8px] font-bold tracking-widest ${
+                                className={`px-2 py-0.5 rounded-lg text-[13px] font-bold tracking-widest ${
                                   client.status === "Active"
                                     ? "bg-primary/10 text-primary uppercase"
                                     : "bg-secondary/10 text-secondary uppercase"
@@ -328,7 +328,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                               </span>
                             )}
                           </div>
-                          <span className="text-[9px] text-textMuted font-bold flex items-center gap-1 ">
+                          <span className="text-[14px] text-textMuted font-bold flex items-center gap-1 ">
                             <Clock size={10} />{" "}
                             {new Date(f.dueDate).toLocaleTimeString([], {
                               hour: "2-digit",
@@ -338,7 +338,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                         </div>
                         <div className="flex flex-col gap-0.5">
                           {client && (
-                            <p className="text-[10px] font-bold text-slate-400 group-hover:text-primary transition-colors">
+                            <p className="text-[12px] font-bold text-slate-400 group-hover:text-primary transition-colors">
                               {client.name}
                             </p>
                           )}
@@ -363,7 +363,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                     setViewAllTab("Overdue");
                     setShowViewAllModal(true);
                   }}
-                  className="text-[10px] text-error font-bold tracking-wider bg-error/5 px-3 py-1.5 rounded-lg border border-error/10 hover:bg-error/10 hover:border-error/20 transition-all"
+                  className="text-[12px] text-error font-bold tracking-wider bg-error/5 px-3 py-1.5 rounded-lg border border-error/10 hover:bg-error/10 hover:border-error/20 transition-all"
                 >
                   View All
                 </button>
@@ -372,7 +372,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                 {missedTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <CheckCircle2 size={24} className="text-slate-200 mb-3" />
-                    <p className="text-[10px] font-bold text-slate-300  tracking-widest">
+                    <p className="text-[12px] font-bold text-slate-300  tracking-widest">
                       No Missed Tasks
                     </p>
                   </div>
@@ -390,13 +390,13 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                         <div className="flex justify-between items-start mb-2.5">
                           <div className="flex gap-1.5 flex-wrap">
                             <span
-                              className={`px-2 py-0.5 rounded-lg text-[8px] font-black tracking-widest bg-white/50 text-error border border-error/10`}
+                              className={`px-2 py-0.5 rounded-lg text-[13px] font-black tracking-widest bg-white/50 text-error border border-error/10`}
                             >
                               Overdue
                             </span>
                             {client && (
                               <span
-                                className={`px-2 py-0.5 rounded-lg text-[8px] font-bold tracking-widest ${
+                                className={`px-2 py-0.5 rounded-lg text-[13px] font-bold tracking-widest ${
                                   client.status === "Active"
                                     ? "bg-primary text-white uppercase"
                                     : "bg-secondary text-white uppercase"
@@ -406,14 +406,14 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                               </span>
                             )}
                           </div>
-                          <span className="text-[8px] text-error/60 font-black flex items-center gap-1 ">
+                          <span className="text-[13px] text-error/60 font-black flex items-center gap-1 ">
                             <Clock size={10} />{" "}
                             {new Date(f.dueDate).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex flex-col gap-0.5">
                           {client && (
-                            <p className="text-[10px] font-bold text-error/60 group-hover:text-error transition-colors">
+                            <p className="text-[12px] font-bold text-error/60 group-hover:text-error transition-colors">
                               {client.name}
                             </p>
                           )}
@@ -442,7 +442,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                   <div className="relative" ref={null}>
                     <button
                       onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
-                      className="flex items-center justify-between gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold tracking-widest text-[#18254D] hover:bg-white hover:border-slate-300 transition-all min-w-[90px] shadow-sm group"
+                      className="flex items-center justify-between gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold tracking-widest text-[#18254D] hover:bg-white hover:border-slate-300 transition-all min-w-[90px] shadow-sm group"
                     >
                       <span>{selectedYear}</span>
                       <ChevronDown
@@ -466,7 +466,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                                 setSelectedYear(y);
                                 setIsYearDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold tracking-wider transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold tracking-wider transition-colors ${
                                 selectedYear === y
                                   ? "bg-[#18254D] text-white"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -486,7 +486,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                       onClick={() =>
                         setIsMonthDropdownOpen(!isMonthDropdownOpen)
                       }
-                      className="flex items-center justify-between gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold tracking-widest text-[#18254D] hover:bg-white hover:border-slate-300 transition-all min-w-[100px] shadow-sm group"
+                      className="flex items-center justify-between gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold tracking-widest text-[#18254D] hover:bg-white hover:border-slate-300 transition-all min-w-[100px] shadow-sm group"
                     >
                       <span>
                         {selectedMonth === "All" ? "All Months" : selectedMonth}
@@ -526,7 +526,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                                 setSelectedMonth(m);
                                 setIsMonthDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold tracking-wider transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold tracking-wider transition-colors ${
                                 selectedMonth === m
                                   ? "bg-[#18254D] text-white"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -630,7 +630,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                       <p className="text-xs font-bold tracking-tight">
                         Reference Follow-ups
                       </p>
-                      <p className="text-[9px] opacity-60 font-medium">
+                      <p className="text-[14px] opacity-60 font-medium">
                         Continue with existing clients
                       </p>
                     </div>
@@ -656,7 +656,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                       <p className="text-xs font-bold tracking-tight">
                         New Follow-ups
                       </p>
-                      <p className="text-[9px] opacity-60 font-medium">
+                      <p className="text-[14px] opacity-60 font-medium">
                         Connect with potential leads
                       </p>
                     </div>
@@ -665,7 +665,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                 </button>
               </div>
               <div className="p-3 bg-slate-50/50 text-center">
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest">
                   Parivartan CRM Selection
                 </p>
               </div>

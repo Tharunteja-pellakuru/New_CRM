@@ -227,7 +227,7 @@ const ProjectCard = ({
       {/* Header with Category */}
       <div className="flex items-start mb-4">
         <span
-          className={`px-2 py-0.5 text-[8px] font-bold tracking-widest border rounded-md ${getCategoryColor(project.category)}`}
+          className={`px-2 py-0.5 text-[13px] font-bold tracking-widest border rounded-md ${getCategoryColor(project.category)}`}
         >
           {CATEGORY_MAP[project.category] || project.category || "Tech"}
         </span>
@@ -239,7 +239,7 @@ const ProjectCard = ({
           {project.name}
         </h4>
         {project.description && (
-          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
+          <p className="text-[13px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
             {project.description}
           </p>
         )}
@@ -248,17 +248,17 @@ const ProjectCard = ({
       {/* Status & Priority Row */}
       <div className="flex items-center justify-between mb-4 mt-auto pt-4 border-t border-slate-50">
         <div className="flex flex-col gap-1.5">
-          <span className="text-[8px] font-black text-slate-300 tracking-widest uppercase">Status</span>
+          <span className="text-[13px] font-black text-slate-300 tracking-widest uppercase">Status</span>
           <span
-            className={`px-2 py-0.5 text-[8px] font-bold tracking-widest border rounded-md w-fit ${getStatusColor(project.status)}`}
+            className={`px-2 py-0.5 text-[13px] font-bold tracking-widest border rounded-md w-fit ${getStatusColor(project.status)}`}
           >
             {project.status?.replace("_", " ") || "Planning"}
           </span>
         </div>
         <div className="flex flex-col items-end gap-1.5">
-          <span className="text-[8px] font-black text-slate-300 tracking-widest uppercase text-right">Priority</span>
+          <span className="text-[13px] font-black text-slate-300 tracking-widest uppercase text-right">Priority</span>
           <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 text-[8px] font-bold tracking-widest border rounded-md ${priorityStyle.badge}`}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 text-[13px] font-bold tracking-widest border rounded-md ${priorityStyle.badge}`}
           >
             <PriorityIcon size={10} />
             {project.priority?.toUpperCase() || "MEDIUM"}
@@ -294,7 +294,7 @@ const ProjectCard = ({
                 style={{ transform: 'scale(1) translate(0, 0)' }}
               >
                 <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                  <p className="text-[9px] font-black text-slate-400  tracking-widest">
+                  <p className="text-[14px] font-black text-slate-400  tracking-widest">
                     Quick Actions
                   </p>
                 </div>
@@ -302,7 +302,7 @@ const ProjectCard = ({
                   <button
                     key={status}
                     onClick={() => handleStatusUpdate(status)}
-                    className="w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest text-[#18254D] hover:bg-slate-50 hover:text-secondary transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest text-[#18254D] hover:bg-slate-50 hover:text-secondary transition-colors"
                   >
                     Move to {status}
                   </button>
@@ -313,7 +313,7 @@ const ProjectCard = ({
                       onEdit && onEdit(project);
                       setIsMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors"
                   >
                     Edit Details
                   </button>
@@ -327,15 +327,15 @@ const ProjectCard = ({
       {/* Footer with Budget & Deadline */}
       <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
         <div className="flex flex-col gap-1">
-          <span className="text-[8px] font-black text-slate-300 tracking-widest uppercase">Budget</span>
-          <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+          <span className="text-[13px] font-black text-slate-300 tracking-widest uppercase">Budget</span>
+          <span className="text-[12px] font-bold text-primary flex items-center gap-0.5">
             <IndianRupee size={10} strokeWidth={3} />
             {project.budget?.toLocaleString("en-IN") || "0"}
           </span>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className="text-[8px] font-black text-slate-300 tracking-widest uppercase text-right">Deadline</span>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
+          <span className="text-[13px] font-black text-slate-300 tracking-widest uppercase text-right">Deadline</span>
+          <div className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500">
             <Calendar size={12} className="text-secondary" />
             <span>
               {project.deadline
@@ -549,7 +549,7 @@ const ProjectBoard = ({
           <div className="w-full lg:w-auto">
             <button
               onClick={() => setShowAddModal(true)}
-              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[11px] font-bold  tracking-wider shadow-lg active:scale-95 group"
+              className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-2xl hover:bg-slate-800 transition-all text-[13px] font-bold  tracking-wider shadow-lg active:scale-95 group"
             >
               <Plus
                 size={16}
@@ -584,7 +584,7 @@ const ProjectBoard = ({
                 onClick={() =>
                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
                 }
-                className="w-full lg:w-auto h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold  tracking-widest text-primary hover:bg-white hover:border-slate-200 transition-all min-w-[200px] shadow-sm shadow-slate-200/50 group"
+                className="w-full lg:w-auto h-[38px] flex items-center justify-between gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[12px] font-bold  tracking-widest text-primary hover:bg-white hover:border-slate-200 transition-all min-w-[200px] shadow-sm shadow-slate-200/50 group"
               >
                 <span>{CATEGORY_MAP[selectedCategory]} Projects</span>
                 <ChevronDown
@@ -606,7 +606,7 @@ const ProjectBoard = ({
                         style={categoryDropdownStyle}
                       >
                         <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                          <p className="text-[9px] font-black text-white/50  tracking-widest">
+                          <p className="text-[14px] font-black text-white/50  tracking-widest">
                             Select Project Category
                           </p>
                         </div>
@@ -614,7 +614,7 @@ const ProjectBoard = ({
                           <button
                             key={catId}
                             onClick={() => handleCategoryChange(catId)}
-                            className={`w-full text-left px-5 py-3.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                            className={`w-full text-left px-5 py-3.5 text-[12px] font-bold  tracking-widest transition-colors ${
                               selectedCategory === catId
                                 ? "bg-slate-100 text-secondary"
                                 : "text-[#18254D] hover:bg-slate-50"
@@ -645,7 +645,7 @@ const ProjectBoard = ({
                 <button
                   key={column.id}
                   onClick={() => setActiveStage(column.id)}
-                  className={`px-3 md:px-5 h-full rounded-xl text-[10px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[90px] md:min-w-[100px] border border-transparent whitespace-nowrap gap-2 ${
+                  className={`px-3 md:px-5 h-full rounded-xl text-[12px] font-bold  tracking-wider transition-all flex items-center justify-center min-w-[90px] md:min-w-[100px] border border-transparent whitespace-nowrap gap-2 ${
                     isActive
                       ? "text-primary bg-white shadow-md border-slate-100"
                       : "text-slate-400 hover:text-slate-500 hover:bg-white/50"
@@ -653,7 +653,7 @@ const ProjectBoard = ({
                 >
                   <span>{column.title}</span>
                   <span
-                    className={`min-w-[20px] h-5 px-1.5 rounded-full text-[9px] font-bold flex items-center justify-center ${
+                    className={`min-w-[20px] h-5 px-1.5 rounded-full text-[14px] font-bold flex items-center justify-center ${
                       isActive
                         ? "bg-primary text-white"
                         : "bg-slate-200 text-slate-500"
@@ -679,7 +679,7 @@ const ProjectBoard = ({
                 {activeColumn.title}
               </h3>
             </div>
-            <span className="bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200  tracking-widest">
+            <span className="bg-slate-100 text-slate-500 text-[12px] font-bold px-3 py-1 rounded-full border border-slate-200  tracking-widest">
               {filteredProjects.length}{" "}
               {filteredProjects.length === 1 ? "Project" : "Projects"}
             </span>
@@ -706,9 +706,9 @@ const ProjectBoard = ({
                   <div key={month} className="space-y-5">
                     <div className="flex items-center gap-4">
                       <div className="h-px flex-1 bg-slate-100" />
-                      <h4 className="text-[11px] font-bold text-slate-400 tracking-[0.3em] uppercase bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100 shadow-sm flex items-center gap-2">
+                      <h4 className="text-[13px] font-bold text-slate-400 tracking-[0.3em] uppercase bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100 shadow-sm flex items-center gap-2">
                         <span>{month}</span>
-                        <span className="text-[9px] text-secondary font-black bg-secondary/10 px-2 py-0.5 rounded-md border border-secondary/20 tracking-normal">
+                        <span className="text-[14px] text-secondary font-black bg-secondary/10 px-2 py-0.5 rounded-md border border-secondary/20 tracking-normal">
                           {monthProjects.length}
                         </span>
                       </h4>
@@ -747,7 +747,7 @@ const ProjectBoard = ({
                 ))}
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="py-6 border-2 border-dashed border-slate-100 rounded-2xl text-slate-300 text-[10px] font-bold  tracking-widest hover:border-secondary hover:text-secondary hover:bg-secondary/[0.02] transition-all group flex flex-col items-center justify-center gap-2 min-h-[100px]"
+                  className="py-6 border-2 border-dashed border-slate-100 rounded-2xl text-slate-300 text-[12px] font-bold  tracking-widest hover:border-secondary hover:text-secondary hover:bg-secondary/[0.02] transition-all group flex flex-col items-center justify-center gap-2 min-h-[100px]"
                 >
                   <Plus
                     size={16}
@@ -762,7 +762,7 @@ const ProjectBoard = ({
             <div className="flex flex-col items-center justify-center py-10">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="w-full max-w-sm py-6 border-2 border-dashed border-slate-100 rounded-2xl text-slate-300 text-[10px] font-bold  tracking-widest hover:border-secondary hover:text-secondary hover:bg-secondary/[0.02] transition-all group flex flex-col items-center justify-center gap-2"
+                className="w-full max-w-sm py-6 border-2 border-dashed border-slate-100 rounded-2xl text-slate-300 text-[12px] font-bold  tracking-widest hover:border-secondary hover:text-secondary hover:bg-secondary/[0.02] transition-all group flex flex-col items-center justify-center gap-2"
               >
                 <Plus
                   size={18}
@@ -799,7 +799,7 @@ const ProjectBoard = ({
                   <h3 className="text-base font-bold tracking-tighter leading-none">
                     Add New Project
                   </h3>
-                  <p className="text-secondary text-[9px] font-bold  tracking-widest mt-0.5">
+                  <p className="text-secondary text-[14px] font-bold  tracking-widest mt-0.5">
                     Project and Client Details
                   </p>
                 </div>
@@ -821,7 +821,7 @@ const ProjectBoard = ({
 
               {/* CLIENT TYPE */}
               <div className="space-y-3 pb-2">
-                <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                   CLIENT TYPE
                 </label>
                 <div className="grid grid-cols-1 gap-4">
@@ -839,7 +839,7 @@ const ProjectBoard = ({
                       <p className="text-sm font-bold text-[#18254D] leading-none">
                         Existing Client
                       </p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                      <p className="text-[14px] text-slate-400 font-bold mt-1">
                         Select from your client list
                       </p>
                     </div>
@@ -849,7 +849,7 @@ const ProjectBoard = ({
 
               {/* CLIENT NAME SEARCHABLE DROPDOWN */}
               <div className="space-y-2 relative">
-                <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                   CLIENT NAME
                 </label>
                 <div className="relative">
@@ -890,7 +890,7 @@ const ProjectBoard = ({
                       />
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top max-h-[200px] overflow-y-auto">
                         <div className="bg-[#18254D] px-4 py-3 border-b border-white/10 sticky top-0">
-                          <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                          <p className="text-[14px] font-bold text-white/50  tracking-widest">
                             Select Client
                           </p>
                         </div>
@@ -930,10 +930,10 @@ const ProjectBoard = ({
                                   : "hover:bg-slate-50"
                               }`}
                             >
-                              <p className="text-[11px] font-bold text-[#18254D]">
+                              <p className="text-[13px] font-bold text-[#18254D]">
                                 {client.name}
                               </p>
-                              <p className="text-[9px] text-slate-400 font-medium mt-0.5">
+                              <p className="text-[14px] text-slate-400 font-medium mt-0.5">
                                 {client.email}
                                 {client.company ? ` · ${client.company}` : ""}
                               </p>
@@ -948,7 +948,7 @@ const ProjectBoard = ({
                               c.company?.toLowerCase().includes(clientSearch.toLowerCase()) ||
                               c.email?.toLowerCase().includes(clientSearch.toLowerCase()))
                         ).length === 0 && (
-                          <p className="px-4 py-3 text-[10px] text-slate-400 font-bold text-center">
+                          <p className="px-4 py-3 text-[12px] text-slate-400 font-bold text-center">
                             No clients found
                           </p>
                         )}
@@ -962,34 +962,34 @@ const ProjectBoard = ({
               {selectedClientId && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                    <label className="text-[14px] font-bold text-slate-400 tracking-widest ml-1">
                       EMAIL
                     </label>
-                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-[#18254D] truncate">
                       {formData.email || "—"}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                    <label className="text-[14px] font-bold text-slate-400 tracking-widest ml-1">
                       PHONE
                     </label>
-                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-[#18254D] truncate">
                       {formData.phone || "—"}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                    <label className="text-[14px] font-bold text-slate-400 tracking-widest ml-1">
                       COUNTRY
                     </label>
-                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-[#18254D] truncate">
                       {formData.country || "—"}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-400 tracking-widest ml-1">
+                    <label className="text-[14px] font-bold text-slate-400 tracking-widest ml-1">
                       CURRENCY
                     </label>
-                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-medium text-[#18254D] truncate">
+                    <p className="px-3.5 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-[#18254D] truncate">
                       {formData.currency || "—"}
                     </p>
                   </div>
@@ -1008,7 +1008,7 @@ const ProjectBoard = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* PROJECT NAME */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT NAME
                   </label>
                   <input
@@ -1028,7 +1028,7 @@ const ProjectBoard = ({
 
                 {/* PROJECT DESCRIPTION */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT DESCRIPTION
                   </label>
                   <textarea
@@ -1047,7 +1047,7 @@ const ProjectBoard = ({
 
                 {/* PROJECT CATEGORY */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT CATEGORY
                   </label>
                   <div className="flex gap-2">
@@ -1062,7 +1062,7 @@ const ProjectBoard = ({
                             projectStatus: "In Progress",
                           })
                         }
-                        className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[10px] tracking-widest ${
+                        className={`flex-1 flex items-center justify-center p-2.5 border-2 rounded-xl transition-all font-bold  text-[12px] tracking-widest ${
                           formData.projectCategory === catId
                             ? "border-primary bg-primary/5 text-primary shadow-sm"
                             : "border-slate-100 text-slate-400 hover:border-slate-200"
@@ -1075,7 +1075,7 @@ const ProjectBoard = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT STATUS
                   </label>
                   <div className="relative">
@@ -1103,7 +1103,7 @@ const ProjectBoard = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Status
                             </p>
                           </div>
@@ -1118,7 +1118,7 @@ const ProjectBoard = ({
                                 });
                                 setIsStatusDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 formData.projectStatus === status
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -1135,7 +1135,7 @@ const ProjectBoard = ({
 
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     PROJECT PRIORITY
                   </label>
                   <div className="relative">
@@ -1163,7 +1163,7 @@ const ProjectBoard = ({
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top">
                           <div className="bg-[#18254D] px-4 py-3 border-b border-white/10">
-                            <p className="text-[9px] font-bold text-white/50  tracking-widest">
+                            <p className="text-[14px] font-bold text-white/50  tracking-widest">
                               Select Priority
                             </p>
                           </div>
@@ -1178,7 +1178,7 @@ const ProjectBoard = ({
                                 });
                                 setIsPriorityDropdownOpen(false);
                               }}
-                              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold  tracking-widest transition-colors ${
+                              className={`w-full text-left px-4 py-2.5 text-[12px] font-bold  tracking-widest transition-colors ${
                                 formData.projectPriority === level
                                   ? "bg-slate-100 text-secondary"
                                   : "text-[#18254D] hover:bg-slate-50"
@@ -1194,7 +1194,7 @@ const ProjectBoard = ({
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1 flex items-center gap-1.5">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1 flex items-center gap-1.5">
                     PROJECT BUDGET (
                     {formData.currency === "USD" ? "USD" : "INR"})
                   </label>
@@ -1223,7 +1223,7 @@ const ProjectBoard = ({
 
                 {/* DATES */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     ONBOARDING DATE
                   </label>
                   <DatePicker
@@ -1238,7 +1238,7 @@ const ProjectBoard = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     DEADLINE (TENTATIVE)
                   </label>
                   <DatePicker
@@ -1254,7 +1254,7 @@ const ProjectBoard = ({
 
                 {/* SCOPE DOCUMENT */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-[10px] font-bold text-[#18254D]  tracking-widest ml-1">
+                  <label className="text-[12px] font-bold text-[#18254D]  tracking-widest ml-1">
                     SCOPE DOCUMENT
                   </label>
                   <div className="relative group">
@@ -1293,7 +1293,7 @@ const ProjectBoard = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#18254D] text-white rounded-2xl text-[11px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
+                  className="w-full py-3 bg-[#18254D] text-white rounded-2xl text-[13px] font-bold  tracking-[0.25em] shadow-xl active:scale-[0.97] transition-all hover:bg-[#1e2e5e] hover:shadow-2xl flex items-center justify-center gap-3 group/btn"
                 >
                   <UserPlus
                     size={20}
