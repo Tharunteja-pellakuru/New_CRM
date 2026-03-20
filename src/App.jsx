@@ -129,7 +129,7 @@ function AppRoutes() {
 
   // Data states
   const [clients, setClients] = useState([]);
-  const [enquiries, setEnquiries] = useState(MOCK_ENQUIRIES);
+  const [enquiries, setEnquiries] = useState([]);
   const [followUps, setFollowUps] = useState([]);
   const [activities, setActivities] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -308,6 +308,34 @@ function AppRoutes() {
       });
   }, [isLoggedIn]);
 
+  // Fetch enquiries from API
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setEnquiries([]);
+      return;
+    }
+
+    fetch(`${BASE_URL}/api/get-enquiries`, {
+      headers: getAuthHeaders(),
+    })
+      .then((res) => (res.ok ? res.json() : { enquiries: [] }))
+      .then((data) => {
+        const transformedEnquiries = data.enquiries.map((e) => ({
+          id: e.enquiry_id || e.uuid,
+          name: e.full_name,
+          email: e.email,
+          phone: e.phone_number,
+          website: e.website_url,
+          message: e.message,
+          status: e.status?.toLowerCase() || "new",
+          remarks: e.remarks || "",
+          date: e.created_at || new Date().toISOString(),
+        }));
+        setEnquiries(transformedEnquiries);
+      })
+      .catch(() => console.log("Failed to fetch enquiries"));
+  }, [isLoggedIn]);
+
   // Fetch projects from API
   useEffect(() => {
     if (!isLoggedIn) {
@@ -433,7 +461,7 @@ function AppRoutes() {
           website_url: data.website || "",
           country: data.country || "",
           lead_category:
-            data.projectCategory || REVERSE_CATEGORY_MAP[data.industry] || 1,
+            data.projectCategory || data.leadCategory || REVERSE_CATEGORY_MAP[data.industry] || 1,
         };
 
         const res = await fetch(`${BASE_URL}/api/add-lead`, {
@@ -1305,6 +1333,114 @@ function AppRoutes() {
     }
   }
 
+  async function handleAddEnquiry(data) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/add-enquiry`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          full_name: data.name,
+          email: data.email,
+          phone_number: data.phone,
+          website_url: data.website,
+          message: data.message,
+          status: "New"
+        }),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        const newEnquiry = {
+          id: result.enquiry.enquiry_id,
+          name: result.enquiry.full_name,
+          email: result.enquiry.email,
+          phone: result.enquiry.phone_number,
+          website: result.enquiry.website_url,
+          message: result.enquiry.message,
+          status: result.enquiry.status.toLowerCase(),
+          date: result.enquiry.created_at,
+          remarks: result.enquiry.remarks || ""
+        };
+        setEnquiries((prev) => [newEnquiry, ...prev]);
+        toast.success("Enquiry added successfully!");
+      } else {
+        toast.error("Failed to add enquiry.");
+      }
+    } catch (err) {
+      console.error("Error adding enquiry:", err);
+      toast.error("An error occurred.");
+    }
+  }
+
+  async function handleUpdateEnquiryStatus(id, status, remarks) {
+    let actualId = id;
+    let actualStatus = status;
+    let actualRemarks = remarks;
+
+    // Handle object argument from some components
+    if (typeof id === 'object' && id !== null) {
+      actualId = id.id;
+      actualStatus = id.status;
+      actualRemarks = id.holdReason || id.remarks || "";
+    }
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/update-enquiry-status/${actualId}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: actualStatus, remarks: actualRemarks }),
+      });
+
+      if (res.ok) {
+        setEnquiries((prev) =>
+          prev.map((e) => (e.id == actualId ? { ...e, status: actualStatus.toLowerCase(), remarks: actualRemarks } : e))
+        );
+        toast.success(`Enquiry marked as ${actualStatus}!`);
+      } else {
+        toast.error("Failed to update enquiry status.");
+      }
+    } catch (err) {
+      console.error("Error updating enquiry:", err);
+      toast.error("An error occurred.");
+    }
+  }
+
+  async function handleDeleteEnquiry(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/delete-enquiry/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+
+      if (res.ok) {
+        setEnquiries((prev) => prev.filter((e) => e.id != id));
+        toast.success("Enquiry deleted successfully!");
+      } else {
+        toast.error("Failed to delete enquiry.");
+      }
+    } catch (err) {
+      console.error("Error deleting enquiry:", err);
+      toast.error("An error occurred.");
+    }
+  }
+
+  async function handlePromoteEnquiry(leadData, enquiryUuid) {
+    try {
+      // Find enquiry by UUID if possible, or use the one from state
+      const enquiry = enquiries.find(e => e.uuid === enquiryUuid || e.id == enquiryUuid);
+      
+      const newLead = await handleAddClient(leadData);
+      if (newLead && enquiry) {
+        await handleUpdateEnquiryStatus(enquiry.id, "Converted");
+      } else if (newLead && enquiryUuid) {
+        // Backup if we only have the ID/UUID
+        await handleUpdateEnquiryStatus(enquiryUuid, "Converted");
+      }
+    } catch (err) {
+      console.error("Error promoting enquiry:", err);
+    }
+  }
+
   // Common props for FollowUpList routes
   const followUpProps = {
     followUps,
@@ -1373,32 +1509,15 @@ function AppRoutes() {
               enquiries={enquiries}
               aiModels={aiModels}
               onPromote={handlePromoteEnquiry}
-              onDismiss={(id) =>
-                setEnquiries((prev) =>
-                  prev.map((e) =>
-                    e.id == id ? { ...e, status: "dismissed" } : e,
-                  ),
-                )
-              }
-              onHold={(id) =>
-                setEnquiries((prev) =>
-                  prev.map((e) => (e.id == id ? { ...e, status: "hold" } : e)),
-                )
-              }
-              onRestore={(id) =>
-                setEnquiries((prev) =>
-                  prev.map((e) => (e.id == id ? { ...e, status: "new" } : e)),
-                )
-              }
-              onDelete={(id) =>
-                setEnquiries((prev) => prev.filter((e) => e.id != id))
-              }
-              onDeleteAll={() =>
-                setEnquiries((prev) =>
-                  prev.filter((e) => e.status !== "dismissed"),
-                )
-              }
-              onUpdate={handleUpdateEnquiry}
+              onDismiss={(id) => handleUpdateEnquiryStatus(id, "Dismissed")}
+              onHold={(id) => handleUpdateEnquiryStatus(id, "Hold")}
+              onRestore={(id) => handleUpdateEnquiryStatus(id, "New")}
+              onDelete={handleDeleteEnquiry}
+              onDeleteAll={() => {
+                const dismissed = enquiries.filter(e => e.status === "dismissed");
+                dismissed.forEach(e => handleDeleteEnquiry(e.id));
+              }}
+              onUpdate={handleUpdateEnquiryStatus}
               onAdd={handleAddEnquiry}
             />
           }

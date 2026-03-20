@@ -362,32 +362,15 @@ const EnquiryList = ({
   const confirmLeadConversion = async () => {
     if (!selectedEnquiry) return;
     try {
-      const updatedEnquiry = {
-        full_name: promoteFormData.name,
-        email: promoteFormData.email,
-        phone_number: promoteFormData.phone,
-        website_url: promoteFormData.website,
-        lead_category: promoteFormData.leadCategory,
-        lead_status: promoteFormData.leadType,
-        country: promoteFormData.country,
-        message: promoteFormData.notes,
-      };
+      // Pass the data to the parent handler
+      onPromote({
+        ...promoteFormData,
+        status: "Lead" // Ensure handleAddClient knows it's a lead
+      }, selectedEnquiry.id || selectedEnquiry.uuid);
 
-      console.log(updatedEnquiry);
-
-      const res = await fetch(`${BASE_URL}/api/add-lead`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeaders(),
-        },
-        body: JSON.stringify(updatedEnquiry),
-      });
-
-      onPromote(updatedEnquiry, selectedEnquiry.uuid);
       setLeadModalOpen(false);
       setSelectedEnquiry(null);
-      toast.success("Lead created successfully!");
+      // toast is now handled in App.jsx handlers
     } catch (err) {
       console.log("Lead Creation Failed", err);
       toast.error("Lead Creation Failed. Please try again.");
