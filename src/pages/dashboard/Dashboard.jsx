@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Area, Line, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Inbox, CheckCircle2, Clock, Activity, UserPlus, Bell, ChevronRight, ChevronDown, X, Info, Users } from "lucide-react";
-import { ANALYTICS_DATA } from "../../constants/mockData";
+import { Users, UserPlus, Clock, CheckCircle2, ChevronRight, ChevronDown, Filter, Calendar, TrendingUp, X, Bell, Info, Inbox, Activity } from "lucide-react";
 
 // Simple stat card component
 function StatCard({ title, value, trend, trendUp, icon, description }) {
@@ -34,20 +33,47 @@ function StatCard({ title, value, trend, trendUp, icon, description }) {
 
 function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], onSelectFollowUp, onNavigate, onClearNotifications, loading = false }) {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedYear, setSelectedYear] = useState(() => {
+    // Default to current year, but if there's no data, try to find the latest year with data
+    const currentYear = new Date().getFullYear().toString();
+    const allYears = [
+      ...clients.map(c => c.joinedDate ? new Date(c.joinedDate).getFullYear() : null),
+      ...enquiries.map(e => e.date ? new Date(e.date).getFullYear() : null),
+      ...leads.map(l => l.joinedDate ? new Date(l.joinedDate).getFullYear() : null)
+    ].filter(Boolean);
+    
+    if (allYears.length > 0) {
+      const latestYear = Math.max(...allYears).toString();
+      return latestYear;
+    }
+    return currentYear;
+  });
   const [selectedMonth, setSelectedMonth] = useState("All");
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [showViewAllModal, setShowViewAllModal] = useState(false);
   const [viewAllTab, setViewAllTab] = useState("Today");
+  const [activeTaskTab, setActiveTaskTab] = useState("Today");
   const [currentUser, setCurrentUser] = useState(null);
   const dropdownRef = useRef(null);
 
-  // Load user from localStorage
+  // Load user from localStorage and sync year with data
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) setCurrentUser(user);
-  }, []);
+
+    // Sync selectedYear with latest data available
+    const dataYears = [
+      ...clients.map(c => c.joinedDate ? new Date(c.joinedDate).getFullYear() : null),
+      ...enquiries.map(e => e.date ? new Date(e.date).getFullYear() : null),
+      ...leads.map(l => l.joinedDate ? new Date(l.joinedDate).getFullYear() : null)
+    ].filter(Boolean);
+    
+    if (dataYears.length > 0) {
+      const latestYear = Math.max(...dataYears).toString();
+      setSelectedYear(latestYear);
+    }
+  }, [clients.length, enquiries.length, leads.length]);
 
   // Helper functions
   function isToday(date) {
@@ -77,26 +103,89 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
 
   // Chart data
   function getChartData() {
-    const factor = { 2023: 0.7, 2024: 1.0, 2025: 1.3, 2026: 1.6 }[selectedYear] || 1.0;
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const yearNum = parseInt(selectedYear);
+    const activeClients = clients.filter(c => c.status === "Active");
     
     if (selectedMonth === "All") {
-      return ANALYTICS_DATA.map((item) => ({
-        ...item,
-        enquiries: Math.round(item.enquiries * factor),
-        clients: Math.round(item.clients * factor),
-        projects: Math.round(item.projects * factor),
-      }));
+      return months.map((month, index) => {
+        const monthlyEnquiries = enquiries.filter(e => {
+          const d = new Date(e.date);
+          return d.getFullYear() === yearNum && d.getMonth() === index;
+        }).length;
+        
+        const monthlyClients = activeClients.filter(c => {
+          const d = new Date(c.joinedDate);
+          return d.getFullYear() === yearNum && d.getMonth() === index;
+        }).length;
+
+        const monthlyLeads = leads.filter(l => {
+          const d = new Date(l.joinedDate);
+          return d.getFullYear() === yearNum && d.getMonth() === index;
+        }).length;
+
+        // Engagement rate: (Clients / (Enquiries + Leads)) * 100
+        const totalPotential = monthlyEnquiries + monthlyLeads;
+        const engagement = totalPotential > 0 ? Math.round((monthlyClients / totalPotential) * 100) : 0;
+
+        return {
+          name: month,
+          enquiries: monthlyEnquiries,
+          clients: monthlyClients,
+          leads: monthlyLeads,
+          engagement: engagement
+        };
+      });
     }
     
-    return [
-      { name: "Week 1", enquiries: Math.round(5 * factor), clients: Math.round(2 * factor), projects: 1, engagement: 60 },
-      { name: "Week 2", enquiries: Math.round(8 * factor), clients: Math.round(4 * factor), projects: 2, engagement: 65 },
-      { name: "Week 3", enquiries: Math.round(6 * factor), clients: Math.round(3 * factor), projects: 1, engagement: 62 },
-      { name: "Week 4", enquiries: Math.round(10 * factor), clients: Math.round(6 * factor), projects: 3, engagement: 75 },
-    ];
+    // Weekly for specific month
+    const monthIndex = months.indexOf(selectedMonth);
+    return [1, 2, 3, 4].map(week => {
+      const startDay = (week - 1) * 7 + 1;
+      const endDay = week * 7;
+      
+      const weeklyEnquiries = enquiries.filter(e => {
+        const d = new Date(e.date);
+        return d.getFullYear() === yearNum && d.getMonth() === monthIndex && d.getDate() >= startDay && d.getDate() <= endDay;
+      }).length;
+      
+      const weeklyClients = activeClients.filter(c => {
+        const d = new Date(c.joinedDate);
+        return d.getFullYear() === yearNum && d.getMonth() === monthIndex && d.getDate() >= startDay && d.getDate() <= endDay;
+      }).length;
+
+      const weeklyLeads = leads.filter(l => {
+        const d = new Date(l.joinedDate);
+        return d.getFullYear() === yearNum && d.getMonth() === monthIndex && d.getDate() >= startDay && d.getDate() <= endDay;
+      }).length;
+
+      const totalPotential = weeklyEnquiries + weeklyLeads;
+      const engagement = totalPotential > 0 ? Math.round((weeklyClients / totalPotential) * 100) : 0;
+
+      return {
+        name: `Week ${week}`,
+        enquiries: weeklyEnquiries,
+        clients: weeklyClients,
+        leads: weeklyLeads,
+        engagement: engagement
+      };
+    });
   }
 
   const chartData = getChartData();
+
+  // Dynamic years for dropdown
+  const availableYears = (() => {
+    const currentYear = new Date().getFullYear();
+    const dataYears = [
+      ...clients.map(c => c.joinedDate ? new Date(c.joinedDate).getFullYear() : null),
+      ...enquiries.map(e => e.date ? new Date(e.date).getFullYear() : null),
+      ...leads.map(l => l.joinedDate ? new Date(l.joinedDate).getFullYear() : null)
+    ].filter(Boolean);
+    
+    const yearSet = new Set([currentYear, ...dataYears]);
+    return Array.from(yearSet).sort((a, b) => b - a).map(String);
+  })();
 
   // Show loading state
   if (loading) {
@@ -274,27 +363,52 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
         </div>
 
         <div className="flex flex-col gap-4 md:gap-5">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col w-full h-[500px]">
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="text-base font-bold text-primary tracking-tight">
-                  Today's Task
-                </h3>
+          <div className="flex flex-wrap gap-4 md:gap-5">
+            <div className="flex-1 min-w-[340px] xl:max-w-[calc(30%-10px)] bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+            <div className="flex flex-row justify-between items-center gap-2 mb-6 flex-nowrap">
+              <div className="flex items-center gap-1 p-0.5 bg-slate-50 rounded-xl border border-slate-100 shrink-0">
                 <button
-                  onClick={() => {
-                    setViewAllTab("Today");
-                    setShowViewAllModal(true);
-                  }}
-                  className="text-[12px] text-primary font-bold tracking-wider bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 hover:bg-slate-100 hover:border-slate-200 transition-all"
+                  onClick={() => setActiveTaskTab("Today")}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold tracking-wider transition-all whitespace-nowrap ${
+                    activeTaskTab === "Today"
+                      ? "bg-white text-primary shadow-sm border border-slate-100"
+                      : "text-slate-400 hover:text-primary"
+                  }`}
                 >
-                  View All
+                  Today's Task
+                </button>
+                <button
+                  onClick={() => setActiveTaskTab("Pending")}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold tracking-wider transition-all whitespace-nowrap ${
+                    activeTaskTab === "Pending"
+                      ? "bg-white text-error shadow-sm border border-slate-100"
+                      : "text-slate-400 hover:text-error"
+                  }`}
+                >
+                  Pending Tasks
                 </button>
               </div>
-              <div className="space-y-4 flex-1 overflow-y-auto pr-1 no-scrollbar">
-                {todayTasks.length === 0 ? (
+              <button
+                onClick={() => {
+                  setViewAllTab(activeTaskTab === "Today" ? "Today" : "Overdue");
+                  setShowViewAllModal(true);
+                }}
+                className={`text-[11px] font-bold tracking-wider px-2 py-1.5 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
+                  activeTaskTab === "Today"
+                    ? "text-primary bg-slate-50 border-slate-100 hover:bg-slate-100 hover:border-slate-200"
+                    : "text-error bg-error/5 border-error/10 hover:bg-error/10 hover:border-error/20"
+                }`}
+              >
+                View All
+              </button>
+            </div>
+
+            <div className="space-y-4 flex-1 overflow-y-auto pr-1 no-scrollbar animate-fade-in" key={activeTaskTab}>
+              {activeTaskTab === "Today" ? (
+                todayTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <CheckCircle2 size={24} className="text-slate-200 mb-3" />
-                    <p className="text-[12px] font-bold text-slate-300  tracking-widest">
+                    <p className="text-[12px] font-bold text-slate-300 tracking-widest">
                       All Caught Up
                     </p>
                   </div>
@@ -349,30 +463,12 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                       </div>
                     );
                   })
-                )}
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col w-full h-[500px]">
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="text-base font-bold text-error tracking-tight flex items-center gap-2">
-                  Missed Tasks
-                </h3>
-                <button
-                  onClick={() => {
-                    setViewAllTab("Overdue");
-                    setShowViewAllModal(true);
-                  }}
-                  className="text-[12px] text-error font-bold tracking-wider bg-error/5 px-3 py-1.5 rounded-lg border border-error/10 hover:bg-error/10 hover:border-error/20 transition-all"
-                >
-                  View All
-                </button>
-              </div>
-              <div className="space-y-4 flex-1 overflow-y-auto pr-1 no-scrollbar">
-                {missedTasks.length === 0 ? (
+                )
+              ) : (
+                missedTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <CheckCircle2 size={24} className="text-slate-200 mb-3" />
-                    <p className="text-[12px] font-bold text-slate-300  tracking-widest">
+                    <p className="text-[12px] font-bold text-slate-300 tracking-widest">
                       No Missed Tasks
                     </p>
                   </div>
@@ -424,12 +520,11 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                       </div>
                     );
                   })
-                )}
-              </div>
+                )
+              )}
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex-1">
+          <div className="flex-[2] min-w-[500px] bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
                 <h3 className="text-base font-bold text-primary tracking-tight">
@@ -459,7 +554,7 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                           onClick={() => setIsYearDropdownOpen(false)}
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl overflow-hidden z-[90] animate-fade-in-up origin-top no-scrollbar">
-                          {["2023", "2024", "2025", "2026"].map((y) => (
+                          {availableYears.map((y) => (
                             <button
                               key={y}
                               onClick={() => {
@@ -577,6 +672,17 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                     fill="#1F3A5F"
                     fillOpacity={0.05}
                     strokeWidth={2.5}
+                    name="Enquiries"
+                  />
+                  <Line
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="leads"
+                    stroke="#F5A623"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={{ r: 2 }}
+                    name="Pending Leads"
                   />
                   <Line
                     yAxisId="left"
@@ -585,12 +691,14 @@ function Dashboard({ followUps, clients, leads = [], enquiries, aiModels = [], o
                     stroke="#2EC4B6"
                     strokeWidth={2.5}
                     dot={{ r: 3 }}
+                    name="Active Clients"
                   />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
+      </div>
 
         {/* View All Follow-ups Selection Modal */}
         {showViewAllModal && (
