@@ -1405,7 +1405,7 @@ const Settings = ({
                         label="Role"
                         value={newAdmin.role}
                         field="add_admin_role"
-                        options={["Admin", "Manager"]}
+                        options={["Admin", "Manager", "User"]}
                         onChange={(val) =>
                           setNewAdmin({ ...newAdmin, role: val })
                         }
@@ -1523,6 +1523,7 @@ const Settings = ({
                                       "Root Admin",
                                       "Admin",
                                       "Manager",
+                                      "User",
                                       "Moderator",
                                     ]}
                                     onChange={(val) =>
